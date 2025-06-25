@@ -1,0 +1,21 @@
+# Ignore uploads folder contents (user-uploaded images)
+uploads/*
+
+# Ignore environment or config files that may contain sensitive info
+*.env
+config.php
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE/editor config files
+.vscode/
+.idea/
+
+# Ignore node_modules or other dependencies (if any frontend build tools added later)
+node_modules/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
