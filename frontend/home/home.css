@@ -1,0 +1,15 @@
+.nav-bar{
+    background-color: white;
+}
+.nav-link{
+    align-items: center;
+}
+.main{
+    background: linear-gradient(180deg, #dfedf1, #f0f6fc, #e0f6e0);
+}
+.page4{
+    background: linear-gradient(180deg, #ddeff4, #e5f7ed, #f7f9f9);
+}
+.page5{
+    background: rgb(26, 26, 31);
+}

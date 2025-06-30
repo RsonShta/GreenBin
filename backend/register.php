@@ -1,21 +1,20 @@
 <?php
-require_once 'db.php';
+require __DIR__ . '/includes/db.php';
 
-// Utility function to sanitize input
-function sanitize($input): string
-{
+function sanitize($input): string {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Input validation
     $firstName = sanitize($_POST['first_name'] ?? '');
     $lastName = sanitize($_POST['last_name'] ?? '');
     $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
     $phone = sanitize($_POST['phone_number'] ?? '');
+    $country = sanitize($_POST['country'] ?? '');
 
-    if (!$firstName || !$lastName || !$email || !$password) {
+    if (!$firstName || !$lastName || !$email || !$password || !$confirmPassword || !$phone || !$country) {
         http_response_code(400);
         exit("Missing required fields.");
     }
@@ -25,10 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit("Password must be at least 8 characters.");
     }
 
-    // Hash the password securely
+    if ($password !== $confirmPassword) {
+        http_response_code(400);
+        exit("Passwords do not match.");
+    }
+
     $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-    // Insert user into database
     try {
         $stmt = $pdo->prepare("
             INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country)
@@ -45,20 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         http_response_code(201);
-        echo "✅ User registered successfully.";
+        echo "User registered successfully.";
     } catch (PDOException $e) {
         if ($e->errorInfo[1] === 1062) {
-            // Duplicate entry
             http_response_code(409);
-            echo "❌ Email already registered.";
+            echo "Email already registered.";
         } else {
             error_log("Registration error: " . $e->getMessage());
             http_response_code(500);
-            echo "❌ Internal Server Error.";
+            echo "Internal Server Error.";
         }
     }
 } else {
     http_response_code(405);
-    echo "❌ Method not allowed.";
+    echo "Method not allowed.";
 }
-?>

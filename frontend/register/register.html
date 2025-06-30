@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register page</title>
+    <link rel="stylesheet" href="/register/register.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <div class="flex justify-center items-center min-h-screen bg-gray-300">
+        <form action="/backend/register.php" method="post" class="text-dark bg-white rounded-lg shadow-lg w-110 p-6">
+
+            <div class="flex justify-center items-center mb-4">
+                <img src="../img/mountain.png" alt="Mountain Logo" class="w-12 h-10 mt-3 mr-2" />
+                <h1 class="text-3xl font-bold text-center">हरित नेपाल</h1>
+            </div>
+
+            <h2 class="text-2xl font-bold text-center mb-4">Join Green Nepal</h2>
+            <h3 class="text-lg text-center mb-6">
+                Create your account to start making a difference in your community
+            </h3>
+
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <div class="w-1/2">
+                        <label class="block font-medium mb-1" for="first_name">First Name</label>
+                        <input id="first_name" name="first_name" type="text" placeholder="First Name" required
+                            class="w-full p-2 rounded-sm bg-white focus:outline-none border shadow-sm" />
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block font-medium mb-1" for="last_name">Last Name</label>
+                        <input id="last_name" name="last_name" type="text" placeholder="Last Name" required
+                            class="w-full p-2 rounded-sm bg-white focus:outline-none border shadow-sm" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1" for="email">Email</label>
+                    <input id="email" name="email" type="email" placeholder="email@example.com" required
+                        class="w-full p-2 rounded-sm bg-white focus:outline-none border shadow-sm" />
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1" for="phone_number">Phone Number</label>
+                    <input id="phone_number" name="phone_number" type="text" placeholder="98XXXXXXXX" required
+                        class="w-full p-2 rounded-sm bg-white focus:outline-none border shadow-sm" />
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1" for="country">Country</label>
+                    <input id="country" name="country" type="text" placeholder="Nepal" required
+                        class="w-full p-2 rounded-sm bg-white focus:outline-none border shadow-sm" />
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1" for="password">Password</label>
+                    <input id="password" name="password" type="password" placeholder="Password" required
+                        class="w-full p-2 rounded-sm bg-white focus:outline-none border shadow-sm" />
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1" for="confirm_password">Confirm Password</label>
+                    <input id="confirm_password" name="confirm_password" type="password" placeholder="Confirm Password"
+                        required class="w-full p-2 rounded-sm bg-white focus:outline-none border shadow-sm" />
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <button
+                    class="w-full bg-green-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition duration-300">
+                    Create Account
+                </button>
+            </div>
+
+            <h4 class="text-lg text-center mt-6">
+                Already have an account?
+                <span class="text-green-600 font-semibold">
+                    <a href="....">Sign in Here</a>
+                </span>
+            </h4>
+
+            <h5 class="text-lg text-center mt-2">
+                <span class="text-green-600 font-semibold">&#8592;
+                    <a href="....">Back to Home</a>
+                </span>
+            </h5>
+
+        </form>
+    </div>
+</body>
+
+</html>
