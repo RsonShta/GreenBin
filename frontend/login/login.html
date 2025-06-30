@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login page</title>
+    <link rel="stylesheet" href="/login/login.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css"></script>
+   
+  </head>
+
+  <body>
+    <div class="flex justify-center item-center min-h-screen bg-gray-300">
+      <form action="post" class="text-dark bg-white rounded-lg shadow-lg w-96">
+
+        <div class="flex justify-center item-center ">
+          <img src="../img/mountain.png" alt="" class="w-12 h-10 mt-3" />
+          <h1 class="text-3xl font-bold text-center m-4">हरित नेपाल</h1>
+        </div>
+
+        <h2 class="text-2xl font-bold text-center mb-4">Welcome</h2>
+        <h3 class="text-1.8xl text-center">Login</h3>
+
+
+        <!-- email section-->
+        <div class="m-4 ">
+          <label class="block mb-4 font-medium">Email</label>
+          <input
+            type="email"
+            placeholder="email"
+            required
+            class="outline w-full p-2 rounded-sm bg-white-500 focus:outline-none   shadow-sm"
+          />
+        </div>
+
+        <!-- Password section -->
+        <div class="m-4">
+          <label class="block mb-4 font-medium">Password</label>
+          <input
+            type="password"
+            placeholder="password"
+            required
+            class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
+          />
+        </div>
+
+        <!-- sign in  button -->
+
+        <div class="m-4">
+          <button
+            class="w-full bg-green-600 hover:bg-blue-700 text-white text-center font-bold py-1 px-4 rounded-lg shadow-sm transition duration-300"
+          >
+          Sign Up
+          </button>
+        </div>
+
+        <!-- create account section -->
+        <h4 class="text-1.8xl text-center m-4">
+          Create Account?
+          <span class="text-green-600 font-semibold">
+            <a href="....">Register</a></span
+          >
+        </h4>
+    <!-- return to home section -->
+
+        <h5 class="text-1.8xl text-center">
+                <span class="text-green-600 font-semibold">&#8592; <!-- > arrow -->
+                    <a href="....">Home</a></span>   
+        </h5>
+
+        <!-- Demo section -->
+        <div class="m-4">
+          <div
+            class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
+          >
+            <h6 class="text-1.8xl block font-medium">Demo Account:</h6>
+            <h7 class="text-1.8xl"
+              >User: user@demo.com / Password <br />Admin: admin@demo.com /
+              password
+            </h7>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
