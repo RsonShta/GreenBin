@@ -1,0 +1,149 @@
+/* Reset & Basics */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #d1d5db; /* Tailwind gray-300 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  font-size: 14px; /* smaller base font */
+}
+
+/* Form Container */
+form {
+  background-color: #ffffff;
+  width: 36rem; /* slightly narrower */
+  padding: 1.75rem; /* less padding */
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo Section */
+form .logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+form .logo img {
+  width: 40px; /* smaller logo */
+  height: 34px;
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+form h1,
+form h2,
+form h3 {
+  text-align: center;
+}
+
+form h1 {
+  font-size: 1.6rem; /* smaller font */
+  font-weight: bold;
+}
+
+form h2 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+form h3 {
+  font-size: 0.875rem;
+  margin-bottom: 1.2rem;
+  color: #555;
+}
+
+/* Input Groups */
+.flex-row {
+  display: flex;
+  gap: 0.75rem; /* smaller gap */
+}
+
+.flex-row > div {
+  flex: 1;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.45rem; /* smaller padding */
+  margin-bottom: 0.8rem; /* smaller margin */
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  outline: none;
+  font-size: 0.875rem; /* smaller font */
+  transition: border-color 0.2s ease-in-out;
+}
+
+input:focus {
+  border-color: #10b981; /* Tailwind green-500 */
+}
+
+/* Labels */
+label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.9rem;
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #16a34a; /* Tailwind green-600 */
+  color: white;
+  font-weight: bold;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: #2563eb; /* Tailwind blue-700 */
+}
+
+/* Footer Links */
+form h4,
+form h5 {
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+form a {
+  color: #16a34a;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+form a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  form {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .flex-row {
+    flex-direction: column;
+  }
+}

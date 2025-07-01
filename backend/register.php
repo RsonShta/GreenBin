@@ -1,6 +1,9 @@
 <?php
 require __DIR__ . '/includes/db.php';
 
+header('Content-Type: application/json');
+session_start();
+
 function sanitize($input): string {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
@@ -16,25 +19,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$firstName || !$lastName || !$email || !$password || !$confirmPassword || !$phone || !$country) {
         http_response_code(400);
-        exit("Missing required fields.");
+        echo json_encode(['message' => 'Missing required fields.']);
+        exit;
     }
 
     if (strlen($password) < 8) {
         http_response_code(400);
-        exit("Password must be at least 8 characters.");
+        echo json_encode(['message' => 'Password must be at least 8 characters.']);
+        exit;
     }
 
     if ($password !== $confirmPassword) {
         http_response_code(400);
-        exit("Passwords do not match.");
+        echo json_encode(['message' => 'Passwords do not match.']);
+        exit;
     }
 
     $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country)
-            VALUES (:first_name, :last_name, :email, :password_hash, :phone, :country)
+            INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country, role)
+            VALUES (:first_name, :last_name, :email, :password_hash, :phone, :country, :role)
         ");
 
         $stmt->execute([
@@ -43,22 +49,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':email' => $email,
             ':password_hash' => $passwordHash,
             ':phone' => $phone,
-            ':country' => $country
+            ':country' => $country,
+            ':role' => 'user'  // default role
         ]);
 
         http_response_code(201);
-        echo "User registered successfully.";
+        echo json_encode(['message' => 'Registration successful.']);
     } catch (PDOException $e) {
         if ($e->errorInfo[1] === 1062) {
             http_response_code(409);
-            echo "Email already registered.";
+            echo json_encode(['message' => 'Email already registered.']);
         } else {
             error_log("Registration error: " . $e->getMessage());
             http_response_code(500);
-            echo "Internal Server Error.";
+            echo json_encode(['message' => 'Internal Server Error.']);
         }
     }
 } else {
     http_response_code(405);
-    echo "Method not allowed.";
+    echo json_encode(['message' => 'Method not allowed.']);
 }

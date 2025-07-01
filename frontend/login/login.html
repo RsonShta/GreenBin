@@ -1,87 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login page</title>
-    <link rel="stylesheet" href="/login/login.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css"></script>
-   
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Page</title>
+  <link rel="stylesheet" href="login.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-  <body>
-    <div class="flex justify-center item-center min-h-screen bg-gray-300">
-      <form action="post" class="text-dark bg-white rounded-lg shadow-lg w-96">
+<body class="bg-gray-300">
+  <div class="flex justify-center items-center min-h-screen">
+    <form action="/GreenBin/backend/login.php" method="POST" class="bg-white rounded-lg shadow-lg w-96 p-6">
 
-        <div class="flex justify-center item-center ">
-          <img src="../img/mountain.png" alt="" class="w-12 h-10 mt-3" />
-          <h1 class="text-3xl font-bold text-center m-4">हरित नेपाल</h1>
-        </div>
+      <!-- Logo & Title -->
+      <div class="flex justify-center items-center mb-4">
+        <img src="../img/mountain.png" alt="Logo" class="w-12 h-10 mt-1 mr-2" />
+        <h1 class="text-3xl font-bold text-center">हरित नेपाल</h1>
+      </div>
 
-        <h2 class="text-2xl font-bold text-center mb-4">Welcome</h2>
-        <h3 class="text-1.8xl text-center">Login</h3>
+      <h2 class="text-2xl font-bold text-center mb-2">Welcome</h2>
+      <h3 class="text-xl text-center mb-6">Login</h3>
 
+      <!-- Email -->
+      <div class="mb-4">
+        <label for="email" class="block mb-1 font-medium">Email</label>
+        <input name="email" id="email" type="email" placeholder="email@example.com" required
+          class="w-full p-2 rounded-sm border shadow-sm focus:outline-none" />
+      </div>
 
-        <!-- email section-->
-        <div class="m-4 ">
-          <label class="block mb-4 font-medium">Email</label>
-          <input
-            type="email"
-            placeholder="email"
-            required
-            class="outline w-full p-2 rounded-sm bg-white-500 focus:outline-none   shadow-sm"
-          />
-        </div>
+      <!-- Password -->
+      <div class="mb-4">
+        <label for="password" class="block mb-1 font-medium">Password</label>
+        <input name="password" id="password" type="password" placeholder="********" required
+          class="w-full p-2 rounded-sm border shadow-sm focus:outline-none" />
+      </div>
 
-        <!-- Password section -->
-        <div class="m-4">
-          <label class="block mb-4 font-medium">Password</label>
-          <input
-            type="password"
-            placeholder="password"
-            required
-            class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
-          />
-        </div>
+      <!-- Login Button -->
+      <div class="mb-4">
+        <button type="submit"
+          class="w-full bg-green-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition duration-300">
+          Login
+        </button>
+      </div>
 
-        <!-- sign in  button -->
+      <!-- Register Link -->
+      <p class="text-center text-sm mb-2">
+        Don't have an account?
+        <a href="../register/register.html" class="text-green-600 font-semibold hover:underline">Register</a>
+      </p>
 
-        <div class="m-4">
-          <button
-            class="w-full bg-green-600 hover:bg-blue-700 text-white text-center font-bold py-1 px-4 rounded-lg shadow-sm transition duration-300"
-          >
-          Sign Up
-          </button>
-        </div>
+      <!-- Home Link -->
+      <p class="text-center text-sm mb-4">
+        <a href="../home/home.html" class="text-green-600 font-semibold hover:underline">&#8592; Back to Home</a>
+      </p>
 
-        <!-- create account section -->
-        <h4 class="text-1.8xl text-center m-4">
-          Create Account?
-          <span class="text-green-600 font-semibold">
-            <a href="....">Register</a></span
-          >
-        </h4>
-    <!-- return to home section -->
+      <!-- Demo Account Info -->
+      <div class="p-3 border shadow-sm rounded-sm bg-gray-50">
+        <p class="font-medium mb-1">Demo Accounts:</p>
+        <p>User: <code>user@demo.com</code> / password</p>
+        <p>Admin: <code>admin@demo.com</code> / password</p>
+      </div>
 
-        <h5 class="text-1.8xl text-center">
-                <span class="text-green-600 font-semibold">&#8592; <!-- > arrow -->
-                    <a href="....">Home</a></span>   
-        </h5>
+    </form>
+  </div>
+  <script src="/path/to/login.js"></script>
 
-        <!-- Demo section -->
-        <div class="m-4">
-          <div
-            class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
-          >
-            <h6 class="text-1.8xl block font-medium">Demo Account:</h6>
-            <h7 class="text-1.8xl"
-              >User: user@demo.com / Password <br />Admin: admin@demo.com /
-              password
-            </h7>
-          </div>
-        </div>
-      </form>
-    </div>
-  </body>
+</body>
 </html>
