@@ -1,0 +1,110 @@
+<!-- index.html (Submit Report Page in /submit folder) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Submit Report</title>
+</head>
+<body class="bg-gray-100">
+
+<!-- Navbar -->
+<nav class="p-2 flex justify-between bg-white rounded-b-xl sticky top-0 shadow-md">
+  <div class="flex gap-4 m-2">
+    <img src="../img/main-logo.png" alt="Logo" class="w-14 h-15" />
+    <div>
+      <h1 class="text-3xl font-bold">हरित नेपाल</h1>
+      <h2 class="text-green-600">GreenBin Nepal</h2>
+    </div>
+  </div>
+  <div class="flex items-center gap-6 px-4">
+    <div class="relative">
+      <button onclick="document.getElementById('langOpts').classList.toggle('hidden')" class="flex items-center gap-2">
+        <i class="fas fa-globe"></i><span>EN</span>
+      </button>
+      <div id="langOpts" class="absolute bg-white border rounded mt-2 hidden z-10">
+        <div class="px-4 py-2 hover:bg-gray-200 cursor-pointer">EN</div>
+        <div class="px-4 py-2 hover:bg-gray-200 cursor-pointer">नेपाली</div>
+      </div>
+    </div>
+    <a href="../home/home.html" class="bg-gray-300 text-black px-4 py-2 rounded font-bold">Logout</a>
+  </div>
+</nav>
+
+<!-- Submit Report Section -->
+<div class="max-w-6xl mx-auto mt-10 bg-white p-6 rounded shadow ">
+  <div class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Submit Environmental Report</h1>
+    <a
+      href="../admin/dashboard.html"
+      class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700"
+    > 
+      Cancel Report
+    </a>
+  </div>
+
+  <form id="reportForm" class="mt-6">
+    <label class="block mb-2 font-medium">Report Title</label>
+    <input
+      type="text"
+      id="reportTitle"
+      class="mb-4 w-full p-2 border rounded"
+      placeholder="e.g., Illegal dumping on Oak Street"
+      required
+    />
+
+    <label class="block mb-2 font-medium">Description</label>
+    <textarea
+      id="reportDescription"
+      class="mb-4 w-full p-2 border rounded"
+      rows="5"
+      placeholder="Describe the issue"
+      required
+    ></textarea>
+
+    <label class="block mb-2 font-medium">Upload Photo (Optional)</label>
+    <input
+      type="file"
+      id="reportPhoto"
+      class="mb-4 w-full border p-2 rounded"
+      accept="image/*"
+    />
+
+    <button
+      type="submit"
+      class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+    >
+      Submit Report
+    </button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('reportForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const title = document.getElementById('reportTitle').value;
+    const description = document.getElementById('reportDescription').value;
+    const date = new Date().toLocaleDateString();
+
+    const report = {
+      id: Date.now(),
+      title,
+      description,
+      date,
+      status: 'Pending'
+    };
+
+    let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+    reports.push(report);
+    localStorage.setItem('reports', JSON.stringify(reports));
+
+    window.location.href = '../admin/dashboard.html';
+  });
+</script>
+</body>
+</html>

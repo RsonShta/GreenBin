@@ -2,41 +2,58 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="home.css" />
-    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+
+     <link rel="stylesheet" href="home.css" />
+
+    <!-- tailwin link -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> 
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <title>Home</title>
   </head>
   <body>
-<!--Language switcher -->
-     
+    <!-- top nav -->
 
-  
-    <!--Top nav  -->
-
-    <nav class="nav-bar p-2 flex justify-between">
+    <nav class="p-2 flex justify-between">
       <div class="flex gap-4 m-2">
         <div>
           <img src="../img/main-logo.png" alt="" class="w-14 h-15" />
         </div>
 
         <div>
-          <h1 class="text-3xl font-bold text-center">हरित नेपाल</h1>
+          <h1 class="text-3xl font-bold text-center" id="title">हरित नेपाल</h1>
           <h2 class="text-1xl text-green-600">GreenBin Nepal</h2>
         </div>
       </div>
+      <!-- language switcher -->
 
       <div class="nav-link flex item-center justify-center gap-8 p-2">
-        <a href="/">नेपाली</a>
+        <div class="language-switcher" id="langSwitcher">
+          <button class="language-button">
+            <i class="fas fa-globe"></i>
+            <span id="currentLang">EN</span>
+          </button>
+          <div class="language-options">
+            <div onclick="setLanguage('en')">EN</div>
+            <div onclick="setLanguage('ne')">नेपाली</div>
+          </div>
+        </div>
+
+        <!-- home section -->
         <a href="">home</a>
 
+        <!-- login section -->
         <a
-          href=""
+          href="../login/login.html"
           class="pt-1 p-2 bg-gray-300 text-black text-center font-bold rounded-lg shadow-sm"
           >Login</a
         >
+        <!-- register section -->
         <a
-          href=""
+          href="../register/register.html"
           class="pt-1 p-2 bg-green-600 hover:bg-blue-700 text-white text-center font-bold rounded-lg shadow-sm transition duration-300"
           >Register</a
         >
@@ -47,7 +64,7 @@
 
     <section>
       <div class="main items-center p-2 justify-center flex flex-col">
-        <h1 class="text-5xl font-bold text-center m-4 mt-20">
+        <h1 class="text-5xl font-bold text-center m-4 mt-20" id="title">
           Report Environmental Issues in <br />
           Nepal
         </h1>
@@ -75,7 +92,6 @@
           >
         </div>
       </div>
-
     </section>
 
     <!-- 3rd page -->
@@ -90,14 +106,11 @@
     <!-- 3rd page 3 container -->
 
     <div class="flex p-2 justify-between py-4">
-
-    <!--समस्या रिपोर्ट  -->
+      <!--समस्या रिपोर्ट  -->
       <div
-        class="m-4 w-110  bg-white hover:bg-gray-50 text-black text-center p-4 rounded-lg shadow-sm transition duration-300 items-center p-2 justify-center flex flex-col"
+        class="m-4 w-110 bg-white hover:bg-gray-50 text-black text-center p-4 rounded-lg shadow-sm transition duration-300 items-center p-2 justify-center flex flex-col"
       >
-        <h6 class="text-2xl font-bold text-center">
-          समस्या रिपोर्ट गर्नुहोस्
-        </h6>
+        <h6 class="text-2xl font-bold text-center">समस्या रिपोर्ट गर्नुहोस्</h6>
 
         <h7 class="text-1xl text-center m-4">Report issues</h7>
 
@@ -110,9 +123,9 @@
       </div>
 
       <!--  स्थान पहिचान -->
-      
+
       <div
-        class="m-4 w-110  bg-white hover:bg-gray-50 text-black text-center p-4 rounded-lg shadow-sm transition duration-300 items-center p-2 justify-center flex flex-col"
+        class="m-4 w-110 bg-white hover:bg-gray-50 text-black text-center p-4 rounded-lg shadow-sm transition duration-300 items-center p-2 justify-center flex flex-col"
       >
         <h9 class="text-2xl font-bold text-center"> स्थान पहिचान </h9>
 
@@ -131,7 +144,7 @@
       <div
         class="m-4 w-110 bg-white hover:bg-gray-50 text-black text-center p-4 rounded-lg shadow-sm transition duration-300 items-center p-2 justify-center flex flex-col"
       >
-        <h12 class="text-2xl font-bold text-center "> सामुदायिक प्रभाव </h12>
+        <h12 class="text-2xl font-bold text-center"> सामुदायिक प्रभाव </h12>
         <h13 class="text-1xl text-center m-4">Community Impact</h13>
 
         <h14 class="text-1xl text-center m-4">
@@ -153,64 +166,93 @@
           नेपालको वातावरणीय समस्या रिपोर्ट गर्नुहोस्
         </h2>
         <h3 class="text-1xl text-center m-4">
-        हिमालय देखि तराई सम्म, नेपालका सबै भौगोलिक क्षेत्रका वातावरणीय चुनौतीहरूलाई सम्बोधन गर्न डिजाइन <br>
-          गरिएको। From the Himalayas to the Terai, designed to address environmental challenges across<br>
+          हिमालय देखि तराई सम्म, नेपालका सबै भौगोलिक क्षेत्रका वातावरणीय
+          चुनौतीहरूलाई सम्बोधन गर्न डिजाइन <br />
+          गरिएको। From the Himalayas to the Terai, designed to address
+          environmental challenges across<br />
           all geographical regions of Nepal.
         </h3>
 
         <!-- 4th page 3 container -->
 
-        <div class="flex gap-2 justify-between m-4 p-2 ">
+        <div class="flex gap-2 justify-between m-4 p-2">
+          <div>
+            <h12
+              class="m-4 text-green-600 flex text-4xl font-bold text-center px-15"
+              >७७</h12
+            >
+            <h13 class="m-4 text-center">जिल्लाहरू / Districts</h13>
+          </div>
 
-        <div>
-        <h12 class="m-4 text-green-600 flex text-4xl font-bold text-center px-15">७७</h12>
-        <h13 class="m-4 text-center">जिल्लाहरू / Districts</h13>
+          <div>
+            <h12
+              class="m-4 text-green-600 flex text-4xl font-bold text-center px-15"
+            >
+              ७</h12
+            >
+            <h13 class="m-4 text-1xl text-center">प्रदेशहरू / Provinces</h13>
+          </div>
 
+          <div>
+            <h2
+              class="m-4 flex text-4xl text-green-600 font-bold text-center px-20"
+            >
+              २९+
+            </h2>
+            <h3 class="m-4 text-center">मिलियन नागरिकहरू / Million Citizens</h3>
+          </div>
+        </div>
       </div>
-
-      <div>
-        <h12 class="m-4 text-green-600 flex text-4xl font-bold text-center px-15"> ७</h12>
-        <h13 class="m-4 text-1xl text-center">प्रदेशहरू / Provinces</h13>
-
-      </div>
-
-  <div>
-    <h2 class="m-4 flex text-4xl text-green-600 font-bold text-center px-20">२९+</h2>
-    <h3 class="m-4 text-center">मिलियन नागरिकहरू / Million Citizens</h3>
-  </div>
-
-      </div>
-
-
-    </div>
-
     </section>
 
+    <!-- footer section-->
 
-     <!-- button -->
-
-        <section>
-      <div class="page5 text-white items-center p-2 justify-center flex flex-col">
-        <h1 class="text-3xl font-bold text-center m-4">
-       हरित नेपाल|GreenBin Nepal
+    <section>
+      <footer class="text-white items-center p-2 justify-center flex flex-col">
+        <h1 class="text-3xl font-bold text-center m-4" id="title">
+          हरित नेपाल|GreenBin Nepal
         </h1>
-        <h2 class="text-1xl text-center">
+        <h2 class="text-1xl text-center" id="description">
           हाम्रो समुदायलाई स्वच्छ बनाउन, एक पटकमा एक रिपोर्ट।
         </h2>
         <h3 class="text-1xl text-center mb-4">
-        Making our communities cleaner, one report at a time.
+          Making our communities cleaner, one report at a time.
         </h3>
+      </footer>
+    </section>
 
-    </div>
-        </section>
-    <a href="index.html"></a>
+    <!-- Language switcher json -->
+    
+    <script>
+      const switcher = document.getElementById("langSwitcher");
 
-   
+      switcher.addEventListener("click", () => {
+        switcher.classList.toggle("active");
+      });
 
-        <!-- Language switcher json -->
-       
+      async function setLanguage(lang) {
+        document.getElementById("currentLang").textContent = lang.toUpperCase();
+        localStorage.setItem("preferredLang", lang);
+        try {
+          const res = await fetch(`./lang/${lang}.json`);
+          const data = await res.json();
+          for (const key in data) {
+            const el = document.getElementById(key);
+            if (el) el.textContent = data[key];
+          }
+        } catch (err) {
+          console.error("Failed to load language file:", err);
+        }
+        switcher.classList.remove("active");
+      }
 
-
-
+      // On load
+      window.onload = () => {
+        const savedLang = localStorage.getItem("preferredLang") || "en";
+        document.getElementById("currentLang").textContent =
+          savedLang.toUpperCase();
+        setLanguage(savedLang);
+      };
+    </script>
   </body>
 </html>

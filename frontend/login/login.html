@@ -4,33 +4,71 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login page</title>
-    <link rel="stylesheet" href="/login/login.css" />
+    <link rel="stylesheet" href="login.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css"></script>
-   
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
   </head>
 
   <body>
-    <div class="flex justify-center item-center min-h-screen bg-gray-300">
-      <form action="post" class="text-dark bg-white rounded-lg shadow-lg w-96">
+    <!-- top nav -->
 
-        <div class="flex justify-center item-center ">
-          <img src="../img/mountain.png" alt="" class="w-12 h-10 mt-3" />
-          <h1 class="text-3xl font-bold text-center m-4">हरित नेपाल</h1>
+    <nav class="p-2 flex justify-between">
+      <div class="flex gap-4 m-2">
+        <div>
+          <img src="../img/main-logo.png" alt="" class="w-14 h-15" />
         </div>
 
-        <h2 class="text-2xl font-bold text-center mb-4">Welcome</h2>
-        <h3 class="text-1.8xl text-center">Login</h3>
+        <div>
+          <h1 class="text-3xl font-bold text-center" id="title">हरित नेपाल</h1>
+          <h2 class="text-1xl text-green-600">GreenBin Nepal</h2>
+        </div>
+      </div>
 
+      <div class="nav-link flex item-center justify-center gap-8 p-2">
+        <div class="language-switcher" id="langSwitcher">
+          <button class="language-button">
+            <i class="fas fa-globe"></i>
+            <span id="currentLang">EN</span>
+          </button>
+          <div class="language-options">
+            <div onclick="setLanguage('en')">EN</div>
+            <div onclick="setLanguage('ne')">नेपाली</div>
+          </div>
+        </div>
+
+      </div>
+
+    </nav>
+
+    <!-- login section -->
+
+    <div class="flex justify-center item-center min-h-screen bg-gray-300">
+      <form
+        action="post"
+        class="text-dark bg-white rounded-lg shadow-lg w-96 m-6"
+      >
+        <div class="flex justify-center item-center">
+          <img src="../img/mountain.png" alt="" class="w-12 h-10 mt-3" />
+          <h1 class="text-3xl font-bold text-center m-4" id="title">
+            हरित नेपाल
+          </h1>
+        </div>
+
+        <h2 class="text-2xl font-bold text-center mb-4" id="title">Welcome</h2>
+        <h3 class="text-1.8xl text-center" id="title">Login</h3>
 
         <!-- email section-->
-        <div class="m-4 ">
+        <div class="m-4">
           <label class="block mb-4 font-medium">Email</label>
           <input
             type="email"
             placeholder="email"
             required
-            class="outline w-full p-2 rounded-sm bg-white-500 focus:outline-none   shadow-sm"
+            class="outline w-full p-2 rounded-sm bg-white-500 focus:outline-none shadow-sm"
           />
         </div>
 
@@ -48,12 +86,15 @@
         <!-- sign in  button -->
 
         <div class="m-4">
+          <form action="../admin/dashboard.html"method="get">
           <button
+          type="submit"
             class="w-full bg-green-600 hover:bg-blue-700 text-white text-center font-bold py-1 px-4 rounded-lg shadow-sm transition duration-300"
           >
-          Sign Up
-          </button>
+            Sign In
+          
         </div>
+     
 
         <!-- create account section -->
         <h4 class="text-1.8xl text-center m-4">
@@ -62,11 +103,14 @@
             <a href="....">Register</a></span
           >
         </h4>
-    <!-- return to home section -->
+        <!-- return to home section -->
 
         <h5 class="text-1.8xl text-center">
-                <span class="text-green-600 font-semibold">&#8592; <!-- > arrow -->
-                    <a href="....">Home</a></span>   
+          <span class="text-green-600 font-semibold"
+            >&#8592;
+            <!-- > arrow -->
+            <a href="....">Home</a></span
+          >
         </h5>
 
         <!-- Demo section -->
@@ -83,5 +127,39 @@
         </div>
       </form>
     </div>
+
+    <!-- Language switcher json -->
+    <script>
+      const switcher = document.getElementById("langSwitcher");
+
+      switcher.addEventListener("click", () => {
+        switcher.classList.toggle("active");
+      });
+
+      async function setLanguage(lang) {
+        document.getElementById("currentLang").textContent = lang.toUpperCase();
+        localStorage.setItem("preferredLang", lang);
+        try {
+          const res = await fetch(`./lang/${lang}.json`);
+          const data = await res.json();
+          for (const key in data) {
+            const el = document.getElementById(key);
+            if (el) el.textContent = data[key];
+          }
+        } catch (err) {
+          console.error("Failed to load language file:", err);
+        }
+        switcher.classList.remove("active");
+      }
+
+      // On load
+      window.onload = () => {
+        const savedLang = localStorage.getItem("preferredLang") || "en";
+        document.getElementById("currentLang").textContent =
+          savedLang.toUpperCase();
+        setLanguage(savedLang);
+      };
+    </script>
+
   </body>
 </html>
