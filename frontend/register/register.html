@@ -20,6 +20,13 @@
       background: rgba(255, 255, 255, 0.8);
       z-index: 0;
     }
+
+    .error-message {
+      color: red;
+      font-size: 0.7rem;
+      margin-top: 0.1rem;
+      min-height: 1em;
+    }
   </style>
 </head>
 
@@ -60,30 +67,28 @@
           <label for="email" class="block font-medium mb-1 text-xs">Email</label>
           <input name="email" id="email" type="email" placeholder="email@example.com" required
             class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
+          <span id="email_error" class="error-message"></span>
         </div>
 
         <div>
           <label for="phone_number" class="block font-medium mb-1 text-xs">Phone Number</label>
           <input name="phone_number" id="phone_number" type="text" placeholder="98XXXXXXXX" required
             class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
-        </div>
-
-        <div>
-          <label for="country" class="block font-medium mb-1 text-xs">Country</label>
-          <input name="country" id="country" type="text" placeholder="Nepal" required
-            class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
+          <span id="phone_error" class="error-message"></span>
         </div>
 
         <div>
           <label for="password" class="block font-medium mb-1 text-xs">Password</label>
           <input name="password" id="password" type="password" placeholder="********" required
             class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
+          <span id="password_error" class="error-message"></span>
         </div>
 
         <div>
           <label for="confirm_password" class="block font-medium mb-1 text-xs">Confirm Password</label>
           <input name="confirm_password" id="confirm_password" type="password" placeholder="********" required
             class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
+          <span id="confirm_error" class="error-message"></span>
         </div>
 
       </div>
@@ -128,7 +133,7 @@
     </form>
   </div>
 
-  <script src="/register/register.js"></script>
+  <script src="../register/register.js"></script>
 </body>
 
 </html>

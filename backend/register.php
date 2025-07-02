@@ -4,7 +4,8 @@ require __DIR__ . '/includes/db.php';
 header('Content-Type: application/json');
 session_start();
 
-function sanitize($input): string {
+function sanitize($input): string
+{
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
@@ -15,9 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
     $phone = sanitize($_POST['phone_number'] ?? '');
-    $country = sanitize($_POST['country'] ?? '');
 
-    if (!$firstName || !$lastName || !$email || !$password || !$confirmPassword || !$phone || !$country) {
+    if (!$firstName || !$lastName || !$email || !$password || !$confirmPassword || !$phone) {
         http_response_code(400);
         echo json_encode(['message' => 'Missing required fields.']);
         exit;
@@ -49,12 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':email' => $email,
             ':password_hash' => $passwordHash,
             ':phone' => $phone,
-            ':country' => $country,
-            ':role' => 'user'  // default role
+            ':country' => "NP",
+            ':role' => 'user'
         ]);
 
+        $userId = $pdo->lastInsertId(); // Get new user ID
+
         http_response_code(201);
-        echo json_encode(['message' => 'Registration successful.']);
+        echo json_encode([
+            'message' => 'Registration successful.',
+            'user_id' => $userId
+        ]);
     } catch (PDOException $e) {
         if ($e->errorInfo[1] === 1062) {
             http_response_code(409);
