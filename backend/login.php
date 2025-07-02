@@ -21,20 +21,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $stmt = $pdo->prepare("SELECT id, first_name, password_hash FROM users WHERE email_id = :email");
+        $stmt = $pdo->prepare("SELECT id, first_name, password_hash, role FROM users WHERE email_id = :email");
         $stmt->execute([':email' => $email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['first_name'];
+            $_SESSION['user_role'] = $user['role'];  // Save role in session
 
             http_response_code(200);
             echo json_encode([
                 'message' => 'Login successful.',
                 'user_id' => $user['id'],
                 'user_name' => $user['first_name'],
-                'role' => 'user'  // add role if you have it in DB
+                'role' => $user['role']  // dynamic role from DB
             ]);
         } else {
             http_response_code(401);
