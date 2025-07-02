@@ -8,13 +8,16 @@ function sanitize($input): string
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
+header('Content-Type: application/json');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'] ?? '';
 
     if (!$email || !$password) {
         http_response_code(400);
-        exit("Missing email or password.");
+        echo json_encode(['message' => 'Missing email or password.']);
+        exit;
     }
 
     try {
@@ -27,17 +30,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_name'] = $user['first_name'];
 
             http_response_code(200);
-            echo "Login successful.";
+            echo json_encode([
+                'message' => 'Login successful.',
+                'user_id' => $user['id'],
+                'user_name' => $user['first_name'],
+                'role' => 'user'  // add role if you have it in DB
+            ]);
         } else {
             http_response_code(401);
-            echo "Invalid email or password.";
+            echo json_encode(['message' => 'Invalid email or password.']);
         }
     } catch (PDOException $e) {
         error_log("Login error: " . $e->getMessage());
         http_response_code(500);
-        echo "Internal Server Error.";
+        echo json_encode(['message' => 'Internal Server Error.']);
     }
 } else {
     http_response_code(405);
-    echo "Method Not Allowed.";
+    echo json_encode(['message' => 'Method Not Allowed.']);
 }
