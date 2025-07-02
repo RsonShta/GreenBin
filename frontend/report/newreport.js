@@ -5,6 +5,7 @@ document.getElementById('reportForm').addEventListener('submit', function (e) {
     const date = new Date().toLocaleDateString();
 
     const report = {
+      id: Date.now(),
       title,
       description,
       date,
@@ -15,5 +16,5 @@ document.getElementById('reportForm').addEventListener('submit', function (e) {
     reports.push(report);
     localStorage.setItem('reports', JSON.stringify(reports));
 
-    window.location.href = 'dashboard.html';
+    window.location.href = '../dashboard/dashboard.html';
   });
