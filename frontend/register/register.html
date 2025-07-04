@@ -1,157 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register page</title>
-    <link rel="stylesheet" href="register.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Page</title>
+  <link rel="stylesheet" href="register.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 
-<body>
+<body class="bg-gray-300">
 
-  <!-- top nav -->
-
-    <nav class="p-2 flex justify-between">
-      <div class="flex gap-4 m-2">
-        <div>
-          <img src="../img/main-logo.png" alt="" class="w-14 h-15" />
-        </div>
-
-        <div>
-          <h1 class="text-3xl font-bold text-center" id="title">हरित नेपाल</h1>
-          <h2 class="text-1xl text-green-600">GreenBin Nepal</h2>
+  <!-- Navigation -->
+  <nav class="p-2 flex justify-between">
+    <div class="flex gap-4 m-2">
+      <img src="../img/main-logo.png" alt="" class="w-14 h-15" />
+      <div>
+        <h1 class="text-3xl font-bold text-center">हरित नेपाल</h1>
+        <h2 class="text-1xl text-green-600">GreenBin Nepal</h2>
+      </div>
+    </div>
+    <div class="nav-link flex item-center justify-center gap-8 p-2">
+      <div class="language-switcher" id="langSwitcher">
+        <button class="language-button">
+          <i class="fas fa-globe"></i>
+          <span id="currentLang">EN</span>
+        </button>
+        <div class="language-options">
+          <div onclick="setLanguage('en')">EN</div>
+          <div onclick="setLanguage('ne')">नेपाली</div>
         </div>
       </div>
+    </div>
+  </nav>
 
-      <div class="nav-link flex item-center justify-center gap-8 p-2">
-        <div class="language-switcher" id="langSwitcher">
-          <button class="language-button">
-            <i class="fas fa-globe"></i>
-            <span id="currentLang">EN</span>
-          </button>
-          <div class="language-options">
-            <div onclick="setLanguage('en')">EN</div>
-            <div onclick="setLanguage('ne')">नेपाली</div>
+  <!-- Registration Form -->
+  <div class="flex justify-center items-center min-h-screen">
+    <form id="registerForm" action="register.php" method="POST" class="m-4 text-dark bg-white rounded-lg shadow-lg w-110 p-6">
+
+      <!-- Error Box -->
+      <div id="errorBox" class="hidden text-red-700 bg-red-100 border border-red-400 px-4 py-2 rounded mb-4 text-center">
+        Password and Confirm Password do not match.
+      </div>
+
+      <div class="flex justify-center items-center mb-4">
+        <img src="../img/mountain.png" alt="" class="w-12 h-10 mt-1" />
+        <h1 class="text-3xl font-bold text-center ml-3">हरित नेपाल</h1>
+      </div>
+
+      <h2 class="text-2xl font-bold text-center mb-2">Join Green Nepal</h2>
+      <h3 class="text-base text-center mb-6">Create your account to start making a difference in your community</h3>
+
+      <!-- Form Fields -->
+      <div class="space-y-4">
+
+        <!-- Name -->
+        <div class="flex gap-4">
+          <div class="w-1/2">
+            <label class="block font-medium mb-1">First Name</label>
+            <input
+              name="first_name"
+              type="text"
+              placeholder="First Name"
+              required
+              minlength="2"
+              maxlength="20"
+              pattern="[A-Za-z]+"
+              title="First name must contain only letters (A-Z) and be 2 to 20 characters long"
+              class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
+            />
+          </div>
+          <div class="w-1/2">
+            <label class="block font-medium mb-1">Last Name</label>
+            <input
+              name="last_name"
+              type="text"
+              placeholder="Last Name"
+              required
+              minlength="2"
+              maxlength="20"
+              pattern="[A-Za-z]+"
+              title="Last name must contain only letters (A-Z) and be 2 to 20 characters long"
+              class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
+            />
           </div>
         </div>
 
-      
+        <!-- Email -->
+        <div>
+          <label class="block font-medium mb-1">Email</label>
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+            class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
+          />
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block font-medium mb-1">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            minlength="8"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$"
+            title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
+            class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
+          />
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <label class="block font-medium mb-1">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            name="confirm_password"
+            type="password"
+            placeholder="Confirm Password"
+            required
+            class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm"
+          />
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+          <button
+            type="submit"
+            class="w-full bg-green-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition duration-300"
+          >
+            Create Account
+          </button>
+        </div>
+
+        <!-- Already Have Account -->
+        <h4 class="text-center">
+          Already have an account?
+          <span class="text-green-600 font-semibold">
+            <a href="../login/login.html">Sign in Here</a>
+          </span>
+        </h4>
+
+        <!-- Back to Home -->
+        <h5 class="text-center">
+          <span class="text-green-600 font-semibold">
+            &#8592; <a href="../home/home.html">Back to Home</a>
+          </span>
+        </h5>
       </div>
-
-    </nav>
-
-    <!-- register section -->
-
-    <div class="flex justify-center item-center min-h-screen bg-gray-300">
-        <form action="post" class="m-4 text-dark bg-white rounded-lg shadow-lg w-110">
-
-            <div class="flex justify-center item-center ">
-                <img src="../img/mountain.png" alt="" class="w-12 h-10 mt-3" />
-                <h1 class="text-3xl font-bold text-center m-4">हरित नेपाल</h1>
-            </div>
-
-            <h2 class="text-2xl font-bold text-center mb-4">Join Green Nepal</h2>
-            <h3 class="text-1.8xl text-center">Create your account to start making a difference in your community</h3>
-
-            <!-- register section -->
-           <div class="m-4 space-y-4">
-  <div class="flex gap-4">
-    <div class="w-1/2">
-      <label class="block font-medium mb-1">First Name</label>
-      <input type="text" placeholder="First Name" required
-        class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm" />
-    </div>
-    <div class="w-1/2">
-      <label class="block font-medium mb-1">Last Name</label>
-      <input type="text" placeholder="Last Name" required
-        class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm" />
-    </div>
+    </form>
   </div>
 
-  <div>
-    <label class="block font-medium mb-1">Email</label>
-    <input type="email" placeholder="email" required
-      class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm" />
-  </div>
+  <!-- Password Match Validation Script -->
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorBox = document.getElementById('errorBox');
 
-  <div>
-    <label class="block font-medium mb-1">Password</label>
-    <input type="password" placeholder="Password" required
-      class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm" />
-  </div>
-</div>
-
-            <div class="m-4">
-                <label class="block mb-4 font-medium">Confirm Password</label>
-                <input type="password" placeholder="Confirm Password" required
-                    class="w-full p-2 rounded-sm bg-white-500 focus:outline-none border shadow-sm" />
-            </div>
-
-            <!-- create account section -->
-
-            <div class="m-4">
-                <button
-                    class="w-full bg-green-600 hover:bg-blue-700 text-white text-center font-bold py-2 px-4 rounded-lg shadow-sm transition duration-300">
-                    Create Accounnt
-                </button>
-            </div>
-
-            <!--already account  -->
-
-            <h4 class="text-1.8xl text-center m-2">
-                Already have an account?
-                <span class="text-green-600 font-semibold">
-                    <a href="....">Sign in Here</a></span>
-            </h4>
-
-            <!-- back to home -->
-            <h5 class="text-1.8xl text-center">
-                <span class="text-green-600 font-semibold">&#8592; <!-- > arrow -->
-                    <a href="....">Back to Home</a></span>
-                
-            </h5>
-    </div>
-
-    <!-- Language switcher json -->
-    <script>
-      const switcher = document.getElementById("langSwitcher");
-
-      switcher.addEventListener("click", () => {
-        switcher.classList.toggle("active");
-      });
-
-      async function setLanguage(lang) {
-        document.getElementById("currentLang").textContent = lang.toUpperCase();
-        localStorage.setItem("preferredLang", lang);
-        try {
-          const res = await fetch(`./lang/${lang}.json`);
-          const data = await res.json();
-          for (const key in data) {
-            const el = document.getElementById(key);
-            if (el) el.textContent = data[key];
-          }
-        } catch (err) {
-          console.error("Failed to load language file:", err);
-        }
-        switcher.classList.remove("active");
+      if (password !== confirmPassword) {
+        e.preventDefault();
+        errorBox.classList.remove('hidden');
+        errorBox.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        errorBox.classList.add('hidden');
       }
+    });
+  </script>
 
-      // On load
-      window.onload = () => {
-        const savedLang = localStorage.getItem("preferredLang") || "en";
-        document.getElementById("currentLang").textContent =
-          savedLang.toUpperCase();
-        setLanguage(savedLang);
-      };
-    </script>
+  <!-- Language Switcher -->
+  <script>
+    const switcher = document.getElementById("langSwitcher");
 
+    switcher.addEventListener("click", () => {
+      switcher.classList.toggle("active");
+    });
+
+    async function setLanguage(lang) {
+      document.getElementById("currentLang").textContent = lang.toUpperCase();
+      localStorage.setItem("preferredLang", lang);
+      try {
+        const res = await fetch(`./lang/${lang}.json`);
+        const data = await res.json();
+        for (const key in data) {
+          const el = document.getElementById(key);
+          if (el) el.textContent = data[key];
+        }
+      } catch (err) {
+        console.error("Failed to load language file:", err);
+      }
+      switcher.classList.remove("active");
+    }
+
+    window.onload = () => {
+      const savedLang = localStorage.getItem("preferredLang") || "en";
+      document.getElementById("currentLang").textContent = savedLang.toUpperCase();
+      setLanguage(savedLang);
+    };
+  </script>
 </body>
-
 </html>
