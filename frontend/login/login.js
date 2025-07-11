@@ -4,44 +4,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("password");
   const emailError = document.getElementById("email_error");
   const passwordError = document.getElementById("password_error");
+  const messageDiv = document.getElementById("message");
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // Real-time validation for email
-  emailInput.addEventListener("input", () => {
-    if (!emailRegex.test(emailInput.value.trim())) {
-      emailError.textContent = "Invalid email format.";
-    } else {
-      emailError.textContent = "";
-    }
-  });
-
-  // Real-time validation for password length (min 8 chars)
-  passwordInput.addEventListener("input", () => {
-    if (passwordInput.value.length < 8) {
-      passwordError.textContent = "Password must be at least 8 characters.";
-    } else {
-      passwordError.textContent = "";
-    }
-  });
-
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    // Clear previous errors
+    messageDiv.textContent = "";
+    emailError.textContent = "";
+    passwordError.textContent = "";
 
     let valid = true;
 
     if (!emailRegex.test(emailInput.value.trim())) {
       emailError.textContent = "Invalid email format.";
       valid = false;
-    } else {
-      emailError.textContent = "";
     }
 
     if (passwordInput.value.length < 8) {
       passwordError.textContent = "Password must be at least 8 characters.";
       valid = false;
-    } else {
-      passwordError.textContent = "";
     }
 
     if (!valid) return;
@@ -57,21 +41,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message || "Login successful!");
+        messageDiv.style.color = "green";
+        messageDiv.textContent = data.message || "Login successful!";
 
-        if (data.role === "admin") {
-          window.location.href =
-            "/GreenBin/frontend/adminDashboard/admindashboard.html";
-        } else if (data.role === "user") {
-          window.location.href = "/GreenBin/frontend/user/dashboard.html";
-        } else {
-          window.location.href = "/GreenBin/frontend/home/home.html";
-        }
+        // Redirect based on role from DB
+        setTimeout(() => {
+          if (data.role === "admin") {
+            window.location.href =
+              "/GreenBin/frontend/adminDashboard/admindashboard.html";
+          } else if (data.role === "user") {
+            window.location.href = "/GreenBin/frontend/dashboard/dashboard.php";
+          } else {
+            window.location.href = "/GreenBin/frontend/home/home.html";
+          }
+        }, 1000);
       } else {
-        alert("Login failed: " + (data.message || "Unknown error"));
+        messageDiv.style.color = "red";
+        messageDiv.textContent = data.message || "Login failed.";
       }
-    } catch (error) {
-      alert("Network error: " + error.message);
+    } catch (err) {
+      messageDiv.style.color = "red";
+      messageDiv.textContent = "Network error: " + err.message;
     }
   });
 });

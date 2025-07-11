@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.ok) {
         const userId = result.user_id;
-        window.location.href = `/GreenBin/frontend/dashboard/dashboard.html`;
+        window.location.href = `/GreenBin/frontend/dashboard/dashboard.php`;
       } else {
         alert("Error: " + result.message);
       }

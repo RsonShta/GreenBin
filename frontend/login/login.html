@@ -12,7 +12,6 @@
       font-family: 'Inter', sans-serif;
     }
 
-    /* Optional: softer overlay on image background */
     .bg-overlay::before {
       content: "";
       position: absolute;
@@ -27,7 +26,6 @@
       margin-top: 0.1rem;
       min-height: 1em;
     }
-
   </style>
 </head>
 
@@ -42,7 +40,10 @@
       </div>
 
       <h2 class="text-2xl font-bold text-center mb-2">Welcome</h2>
-      <h3 class="text-xl text-center mb-6">Login</h3>
+      <h3 class="text-xl text-center mb-4">Login</h3>
+
+      <!-- Message -->
+      <div id="message" class="text-sm text-center mb-3 font-medium" style="min-height: 1.5rem;"></div>
 
       <!-- Email -->
       <div class="mb-4">

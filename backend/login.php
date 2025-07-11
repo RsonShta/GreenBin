@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/includes/db.php';
+require $_SERVER['DOCUMENT_ROOT'] . 'GreenBin/backend/includes/db.php';
 
 session_start();
 

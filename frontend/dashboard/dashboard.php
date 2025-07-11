@@ -1,3 +1,13 @@
+<?php
+
+require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
+
+requireRole(['superAdmin', 'admin', 'user']);
+
+$userName = htmlspecialchars($_SESSION['user_name']);
+$userRole = $_SESSION['user_role'];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -37,10 +47,13 @@
     </div>
     <div class="flex items-center gap-6 text-sm">
       <span class="flex items-center gap-1 text-gray-600"><i class="fas fa-globe"></i> नेपाली</span>
-      <span class="flex items-center gap-1 text-gray-600"><i class="fas fa-user"></i> Welcome, roshan@gmail.com</span>
-<a href="../login/login.html" class="border px-3 py-1 rounded-md text-gray-800 hover:bg-gray-100 flex items-center gap-1 text-sm">
-  <i class="fas fa-sign-out-alt"></i> Logout
-</a>
+      <span class="flex items-center gap-1 text-gray-600">
+        <i class="fas fa-user"></i> Welcome, <?= $userName ?> ji
+      </span>
+      <a href="../login/login.html"
+        class="border px-3 py-1 rounded-md text-gray-800 hover:bg-gray-100 flex items-center gap-1 text-sm">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
 
     </div>
   </header>
@@ -87,17 +100,17 @@
     </section>
 
     <section class="max-w-5xl mx-auto mt-12 bg-white border rounded-lg shadow p-6">
-  <h2 class="text-xl font-semibold text-gray-800 mb-2">Your Reports</h2>
-  <p class="text-sm text-gray-500 mb-6">View the environmental reports you've submitted.</p>
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Your Reports</h2>
+      <p class="text-sm text-gray-500 mb-6">View the environmental reports you've submitted.</p>
 
-  <div id="report-list" class="space-y-4">
-    <!-- Empty state (Shown when no reports) -->
-    <div id="no-reports" class="text-center text-gray-500 py-8 border border-dashed rounded-md">
-      <p class="text-sm mb-3">No reports submitted yet.</p>
-      <button class="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition">
-        Submit Your First Report
-      </button>
-    </div>
+      <div id="report-list" class="space-y-4">
+        <!-- Empty state (Shown when no reports) -->
+        <div id="no-reports" class="text-center text-gray-500 py-8 border border-dashed rounded-md">
+          <p class="text-sm mb-3">No reports submitted yet.</p>
+          <button class="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition">
+            Submit Your First Report
+          </button>
+        </div>
   </main>
 
   <script src="https://kit.fontawesome.com/3f471bb5a5.js" crossorigin="anonymous"></script>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SuperAdmin Login - GreenBin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-green-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded shadow-md w-96">
+      <h2 class="text-2xl font-bold mb-6 text-green-700">SuperAdmin Login</h2>
+      <form
+        id="loginForm"
+        action="/GreenBin/backend/superAdmin/superAdminLogin.php"
+        method="POST"
+        class="space-y-4"
+      >
+        <div>
+          <label for="email" class="block text-sm font-medium mb-1"
+            >Email</label
+          >
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-green-200"
+          />
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium mb-1"
+            >Password</label
+          >
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-green-200"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition"
+        >
+          Login
+        </button>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("loginForm");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        try {
+          const res = await fetch(
+            "/GreenBin/backend/superAdmin/superAdminLogin.php",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          const data = await res.json();
+
+          if (res.ok && data.redirect) {
+            window.location.href = data.redirect; // ✅ Redirect handled here
+          } else {
+            alert(data.message || "Login failed");
+          }
+        } catch (err) {
+          alert("Server error. Please try again.");
+        }
+      });
+    </script>
+  </body>
+</html>
