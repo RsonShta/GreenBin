@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Redirect /login to /pages/login.php
+RewriteRule ^login$ /pages/login.php [L,QSA]
+
+# Similarly for register, dashboard, etc.
+RewriteRule ^register$ /pages/register.php [L,QSA]
+RewriteRule ^dashboard$ /pages/dashboard.php [L,QSA]

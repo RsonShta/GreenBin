@@ -48,11 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           if (data.role === "admin") {
             window.location.href =
-              "/GreenBin/frontend/adminDashboard/admindashboard.html";
+              "/GreenBin/pages/adminDashboard.php";
           } else if (data.role === "user") {
-            window.location.href = "/GreenBin/frontend/dashboard/dashboard.php";
+            window.location.href = "/GreenBin/pages/dashboard.php";
           } else {
-            window.location.href = "/GreenBin/frontend/home/home.html";
+            window.location.href = "/GreenBin/pages/home.php";
           }
         }, 1000);
       } else {
