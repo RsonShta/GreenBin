@@ -1,0 +1,285 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header .logo img {
+            height: 50px;
+        }
+
+        header .language select {
+            padding: 8px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+        }
+
+        header .user-info {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        header .user-info a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        main {
+            margin-top: 30px;
+        }
+
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            width: 22%;
+            text-align: center;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .stat p {
+            font-size: 30px;
+            font-weight: bold;
+            margin: 0;
+            color: #007bff;
+        }
+
+        .reports {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .reports h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .login-form,
+        .logout-form {
+            text-align: center;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        .login-form input,
+        .login-form button {
+            padding: 12px;
+            width: 80%;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .login-form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .login-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* When logged out */
+        .logout-form {
+            display: none;
+        }
+
+        /* When logged in */
+        .dashboard {
+            display: none;
+        }
+
+        /* Nepali font styling */
+        .nepali {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="img/mountain.png" alt="GreenBin Nepal">
+            </div>
+            <div class="language">
+                <select id="language-selector">
+                    <option value="english">English</option>
+                    <option value="nepali">नेपाली</option>
+                </select>
+            </div>
+            <div class="user-info">
+                <span id="user-name">Admin Panel</span>
+                <a href="#" id="logout-link" onclick="logout()">Logout</a>
+            </div>
+        </header>
+
+        <main>
+            <!-- Login Form -->
+            <div id="login-form" class="login-form">
+                <h2>Login to Admin Panel</h2>
+                <input type="text" id="username" placeholder="Enter Username">
+                <input type="password" id="password" placeholder="Enter Password">
+                <button onclick="login()">Login</button>
+            </div>
+
+            <!-- Admin Dashboard (Only shown after login) -->
+            <div id="admin-dashboard" class="dashboard">
+                <div class="dashboard-stats">
+                    <div class="stat">
+                        <h3>Total Reports</h3>
+                        <p id="total-reports">0</p>
+                    </div>
+                    <div class="stat">
+                        <h3>Pending</h3>
+                        <p id="pending-reports">0</p>
+                    </div>
+                    <div class="stat">
+                        <h3>In Progress</h3>
+                        <p id="in-progress-reports">0</p>
+                    </div>
+                    <div class="stat">
+                        <h3>Resolved</h3>
+                        <p id="resolved-reports">0</p>
+                    </div>
+                </div>
+
+                <section class="reports">
+                    <h2>Environmental Reports</h2>
+                    <div id="reports-list">
+                        <p>No reports found. No reports have been submitted yet.</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentLanguage = 'english';
+        const userData = { username: 'admin', password: 'admin123' }; // Example credentials
+
+        // Language Switching Function
+        document.getElementById('language-selector').addEventListener('change', (e) => {
+            currentLanguage = e.target.value;
+            changeLanguage();
+        });
+
+        function changeLanguage() {
+            const userNameText = currentLanguage === 'english' ? 'Admin Panel' : 'व्यवस्थापक प्यानल';
+            document.getElementById('user-name').textContent = userNameText;
+
+            const reportsText = currentLanguage === 'english' ? 'Environmental Reports' : 'पर्यावरणीय रिपोर्ट';
+            document.querySelector('.reports h2').textContent = reportsText;
+
+            // Update stats' text
+            document.querySelectorAll('.stat h3').forEach((el, index) => {
+                if (currentLanguage === 'english') {
+                    if (index === 0) el.textContent = 'Total Reports';
+                    else if (index === 1) el.textContent = 'Pending';
+                    else if (index === 2) el.textContent = 'In Progress';
+                    else if (index === 3) el.textContent = 'Resolved';
+                } else {
+                    if (index === 0) el.textContent = 'कुल रिपोर्ट';
+                    else if (index === 1) el.textContent = 'लम्बित';
+                    else if (index === 2) el.textContent = 'प्रगति मा';
+                    else if (index === 3) el.textContent = 'समाधान';
+                }
+            });
+        }
+
+        // Login and Logout Logic
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === userData.username && password === userData.password) {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                document.getElementById('logout-link').style.display = 'inline-block';
+            } else {
+                alert('Incorrect username or password');
+            }
+        }
+
+        function logout() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('logout-link').style.display = 'none';
+        }
+
+        // Simulate fetching report data
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchReportsData();
+        });
+
+        function fetchReportsData() {
+            // Here we're simulating the data for demo purposes
+            setTimeout(() => {
+                const data = {
+                    total_reports: 100,
+                    pending_reports: 30,
+                    in_progress_reports: 50,
+                    resolved_reports: 20
+                };
+                document.getElementById('total-reports').textContent = data.total_reports;
+                document.getElementById('pending-reports').textContent = data.pending_reports;
+                document.getElementById('in-progress-reports').textContent = data.in_progress_reports;
+                document.getElementById('resolved-reports').textContent = data.resolved_reports;
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
