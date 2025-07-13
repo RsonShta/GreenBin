@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - हरित नेपाल</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -36,71 +37,151 @@
       </div>
     </div>
     <div class="flex items-center gap-6 text-sm">
-      <span class="flex items-center gap-1 text-gray-600"><i class="fas fa-globe"></i> नेपाली</span>
-      <span class="flex items-center gap-1 text-gray-600"><i class="fas fa-user"></i> Welcome, roshan@gmail.com</span>
-<a href="../login/login.html" class="border px-3 py-1 rounded-md text-gray-800 hover:bg-gray-100 flex items-center gap-1 text-sm">
-  <i class="fas fa-sign-out-alt"></i> Logout
-</a>
-
+      <span class="text-gray-600"><i class="fas fa-user"></i> Welcome, roshan@gmail.com</span>
+      <a href="../login/login.html" class="border px-3 py-1 rounded-md text-gray-800 hover:bg-gray-100 text-sm flex items-center gap-1">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <main class="max-w-6xl mx-auto p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold">Dashboard</h2>
-      <button class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md text-sm flex items-center gap-2">
-        <i class="fas fa-file-alt"></i> Cancel Report
-      </button>
+    <!-- Tabs -->
+    <div class="flex space-x-4 mb-6 border-b">
+      <button id="tab-reports-btn" class="py-2 px-4 border-b-2 border-green-700 text-green-700 font-semibold">Reports</button>
+      <button id="tab-analytics-btn" class="py-2 px-4 border-b-2 border-transparent hover:border-green-700 text-gray-600 hover:text-green-700">Analytics</button>
     </div>
 
-    <!-- Report Form -->
-    <section class="bg-white p-6 rounded-lg shadow-md">
-      <h3 class="text-xl font-bold mb-1">Submit Environmental Report</h3>
-      <p class="text-sm text-gray-600 mb-5">Help make your community cleaner by reporting environmental issues</p>
-
-      <form class="space-y-4">
-        <div>
-          <label for="reportTitle" class="block text-sm font-medium mb-1">Report Title</label>
-          <input id="reportTitle" type="text" placeholder="e.g., Illegal dumping on Oak Street" required
-            class="w-full border border-gray-300 p-2 rounded-md focus:ring focus:ring-green-200 focus:outline-none">
-        </div>
-
-        <div>
-          <label for="description" class="block text-sm font-medium mb-1">Description</label>
-          <textarea id="description" placeholder="Description" required
-            class="w-full border border-gray-300 p-2 rounded-md focus:ring focus:ring-green-200 focus:outline-none h-32"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium mb-1">Upload Photo (Optional)</label>
-          <input type="file" class="w-full border border-gray-300 p-2 rounded-md" accept="image/*">
-        </div>
-
-        <div class="pt-4">
-          <button type="submit"
-            class="bg-green-700 hover:bg-green-800 text-white w-full py-2 rounded-md flex justify-center items-center gap-2">
-            <i class="fas fa-upload"></i> Submit
+    <!-- Reports Tab Content -->
+    <section id="tab-reports" class="block">
+      <div class="bg-white p-6 rounded-lg shadow mb-10">
+        <h3 class="text-xl font-bold mb-2">Submit Environmental Report</h3>
+        <p class="text-sm text-gray-600 mb-4">Help make your community cleaner by reporting environmental issues</p>
+        <form class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium">Report Title</label>
+            <input type="text" class="w-full border border-gray-300 p-2 rounded-md" placeholder="e.g., Illegal dumping on Oak Street">
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Description</label>
+            <textarea class="w-full border border-gray-300 p-2 rounded-md h-28" placeholder="Describe the issue..."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Upload Photo</label>
+            <input type="file" class="w-full border border-gray-300 p-2 rounded-md">
+          </div>
+          <button type="submit" class="bg-green-700 hover:bg-green-800 text-white w-full py-2 rounded-md">
+            Submit Report
           </button>
+        </form>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-xl font-semibold mb-3">Your Reports</h3>
+        <div id="report-list" class="text-center text-gray-500 py-8 border border-dashed rounded-md">
+          <p>No reports submitted yet.</p>
+          <button class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Submit Your First Report</button>
         </div>
-      </form>
+      </div>
     </section>
 
-    <section class="max-w-5xl mx-auto mt-12 bg-white border rounded-lg shadow p-6">
-  <h2 class="text-xl font-semibold text-gray-800 mb-2">Your Reports</h2>
-  <p class="text-sm text-gray-500 mb-6">View the environmental reports you've submitted.</p>
+    <!-- Analytics Tab Content -->
+    <section id="tab-analytics" class="hidden">
+      <h3 class="text-2xl font-bold mb-6">Analytics Overview</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Pie Chart -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h4 class="text-lg font-semibold mb-4">Report Status</h4>
+          <canvas id="statusChart" height="200"></canvas>
+        </div>
 
-  <div id="report-list" class="space-y-4">
-    <!-- Empty state (Shown when no reports) -->
-    <div id="no-reports" class="text-center text-gray-500 py-8 border border-dashed rounded-md">
-      <p class="text-sm mb-3">No reports submitted yet.</p>
-      <button class="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition">
-        Submit Your First Report
-      </button>
-    </div>
+        <!-- Line Chart -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h4 class="text-lg font-semibold mb-4">Monthly Reports</h4>
+          <canvas id="monthlyChart" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h4 class="text-lg font-semibold mb-4">Report Categories</h4>
+        <canvas id="categoryChart" height="200"></canvas>
+      </div>
+    </section>
   </main>
 
+  <!-- Scripts -->
   <script src="https://kit.fontawesome.com/3f471bb5a5.js" crossorigin="anonymous"></script>
+  <script>
+    // Tab toggle logic
+    const tabReports = document.getElementById('tab-reports');
+    const tabAnalytics = document.getElementById('tab-analytics');
+    const tabReportsBtn = document.getElementById('tab-reports-btn');
+    const tabAnalyticsBtn = document.getElementById('tab-analytics-btn');
+
+    tabReportsBtn.addEventListener('click', () => {
+      tabReports.classList.remove('hidden');
+      tabAnalytics.classList.add('hidden');
+      tabReportsBtn.classList.add('border-green-700', 'text-green-700');
+      tabAnalyticsBtn.classList.remove('border-green-700', 'text-green-700');
+    });
+
+    tabAnalyticsBtn.addEventListener('click', () => {
+      tabAnalytics.classList.remove('hidden');
+      tabReports.classList.add('hidden');
+      tabAnalyticsBtn.classList.add('border-green-700', 'text-green-700');
+      tabReportsBtn.classList.remove('border-green-700', 'text-green-700');
+    });
+
+    // Chart.js graphs
+    new Chart(document.getElementById("statusChart"), {
+      type: 'pie',
+      data: {
+        labels: ["Pending", "In Progress", "Resolved"],
+        datasets: [{
+          data: [5, 3, 7],
+          backgroundColor: ["#f59e0b", "#3b82f6", "#10b981"]
+        }]
+      }
+    });
+
+    new Chart(document.getElementById("monthlyChart"), {
+      type: 'line',
+      data: {
+        labels: ["Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+        datasets: [{
+          label: "Reports",
+          data: [2, 6, 4, 8, 5, 7],
+          borderColor: "#22c55e",
+          backgroundColor: "rgba(34,197,94,0.2)",
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("categoryChart"), {
+      type: 'bar',
+      data: {
+        labels: ["Waste", "Air", "Water", "Noise", "Other"],
+        datasets: [{
+          label: "Reports",
+          data: [4, 2, 3, 1, 5],
+          backgroundColor: "#3b82f6"
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>
