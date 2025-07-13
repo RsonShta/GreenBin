@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nepal Waste Management - Admin Dashboard</title>
+
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <!-- Link your custom CSS -->
+  <link rel="stylesheet" href="admindashboard.css" />
+  <!-- Bin creation CSS -->
+  <link rel="stylesheet" href="create-bin.css" />
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1><i class="fas fa-recycle"></i> Waste Management</h1>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="sidebar-menu">
+          <li class="active" data-section="dashboard"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+          <li data-section="bins"><a href="#"><i class="fas fa-trash"></i> Waste Bins</a></li>
+          <li data-section="drivers"><a href="#"><i class="fas fa-truck"></i> Drivers</a></li>
+          <li data-section="complaints"><a href="#"><i class="fas fa-exclamation-triangle"></i> Complaints</a></li>
+          <li data-section="users"><a href="#"><i class="fas fa-users"></i> Users</a></li>
+          <li data-section="settings"><a href="#"><i class="fas fa-cogs"></i> Settings</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+          <input type="search" class="search-input" placeholder="Search..." />
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Admin" />
+            <div class="user-info">
+              <span class="user-name">Admin User</span>
+              <small class="user-role">Super Admin</small>
+            </div>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <button class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+      </header>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="content-section active-section">
+        <h2>Dashboard Overview</h2>
+        <p>Welcome to Nepal Waste Management Admin Dashboard!</p>
+        <div class="row">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header">
+                <h3>Recent Complaints</h3>
+                <div class="card-actions">
+                  <button><i class="fas fa-sync-alt"></i></button>
+                  <button><i class="fas fa-ellipsis-v"></i></button>
+                </div>
+              </div>
+              <div class="card-body table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr><th>ID</th><th>User</th><th>Location</th><th>Type</th><th>Status</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>#CMP-1001</td><td>Ram Bahadur</td><td>Kathmandu, Ward 5</td><td>Overflow</td>
+                      <td><span class="badge badge-warning">Pending</span></td>
+                      <td><button class="action-btn"><i class="fas fa-eye"></i></button> <button class="action-btn"><i class="fas fa-user-tag"></i></button></td>
+                    </tr>
+                    <tr>
+                      <td>#CMP-1002</td><td>Sita Devi</td><td>Lalitpur, Ward 3</td><td>Damaged Bin</td>
+                      <td><span class="badge badge-success">Resolved</span></td>
+                      <td><button class="action-btn"><i class="fas fa-eye"></i></button></td>
+                    </tr>
+                    <tr>
+                      <td>#CMP-1003</td><td>Hari Prasad</td><td>Bhaktapur, Ward 7</td><td>Missed Collection</td>
+                      <td><span class="badge badge-info">In Progress</span></td>
+                      <td><button class="action-btn"><i class="fas fa-eye"></i></button> <button class="action-btn"><i class="fas fa-user-tag"></i></button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h3>Recent Bin Updates</h3>
+                <div class="card-actions"><button><i class="fas fa-ellipsis-v"></i></button></div>
+              </div>
+              <div class="card-body">
+                <div class="updates-list">
+                  <div class="update-item"><p><strong>Bin #B-2045</strong> in Kathmandu reached 85% capacity</p><small>2 hours ago</small></div>
+                  <div class="update-item"><p><strong>Bin #B-3122</strong> in Lalitpur was emptied</p><small>5 hours ago</small></div>
+                  <div class="update-item"><p>New bin <strong>#B-4098</strong> installed in Bhaktapur</p><small>1 day ago</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Waste Bin Section with Create Bin -->
+      <section id="bins" class="content-section">
+        <h2>Waste Bins Management</h2>
+        <div class="create-bin-container">
+          <h1><i class="fas fa-trash"></i> Create Bin</h1>
+          <p>Add new garbage bins to the system</p>
+
+          <form id="create-bin-form">
+            <h2>Bin Information</h2>
+            <div class="row">
+              <input type="text" id="bin-id" placeholder="Bin ID" required>
+              <select id="bin-type" required>
+                <option value="">Select bin type</option>
+                <option value="organic">Organic Waste</option>
+                <option value="recyclable">Recyclable Waste</option>
+                <option value="hazardous">Hazardous Waste</option>
+                <option value="general">General Waste</option>
+              </select>
+            </div>
+
+            <input type="text" id="specific-location" placeholder="Specific location e.g., Near Thamel Chowk" required>
+
+            <h2>Specific Location</h2>
+            <div class="row">
+              <select id="province" required><option value="">Select province</option></select>
+              <select id="district" disabled required><option value="">Select district</option></select>
+            </div>
+            <div class="row">
+              <select id="municipality" disabled required><option value="">Select municipality</option></select>
+              <select id="ward" disabled required><option value="">Select ward</option></select>
+            </div>
+
+            <input type="number" id="capacity" placeholder="Capacity (Liters)" required>
+
+            <div id="photo-upload" class="photo-upload">
+              <div class="upload-icon">📷</div>
+              <p>Click to upload photos (<span id="photo-count">0</span>/3)</p>
+              <input type="file" id="file-input" accept="image/*" multiple>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn-primary">📍 Create Bin</button>
+              <button type="reset" class="btn-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Drivers Sections -->
+      <section id="drivers" class="content-section">
+        <div class="container">
+          <h1><i class="fa-solid fa-truck"></i> Driver Management</h1>
+          <p class="subtitle">Manage garbage collection drivers and their routes</p>
+
+          <div class="top-bar">
+            <input type="text" id="search" placeholder="Search drivers..." />
+            <button class="add-driver-btn">+ Add Driver</button>
+          </div>
+
+          <form id="driverForm">
+            <h2>Add New Driver</h2>
+            <div class="form-row">
+              <input type="text" placeholder="Enter driver’s full name" id="name" required />
+              <input type="text" placeholder="+977-9841234567" id="phone" required />
+            </div>
+            <div class="form-row">
+              <input type="email" placeholder="driver@example.com" id="email" required />
+              <input type="text" placeholder="DL001234" id="license" required />
+            </div>
+            <div class="form-row">
+              <input type="text" placeholder="BA-12-PA-1234" id="vehicle" required />
+              <input type="text" placeholder="Route A" id="route" />
+            </div>
+            <div class="form-row">
+              <select id="area">
+                <option value="">Select area</option>
+                <option value="Kathmandu">Kathmandu</option>
+                <option value="Pokhara">Pokhara</option>
+                <option value="Lalitpur">Lalitpur</option>
+              </select>
+            </div>
+
+            <div class="upload-section">
+              <label for="photoUpload">Driver Photo</label>
+              <div class="upload-box">
+                <input type="file" id="photoUpload" accept="image/*" />
+                <span>Click to upload photos (0/1)</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="add-driver-btn">Add Driver</button>
+              <button type="reset" class="cancel-btn">Cancel</button>
+            </div>
+          </form>
+
+          <div class="driver-card">
+            <div class="driver-info">
+              <h3>Ram Bahadur Shrestha</h3>
+              <p><strong>License:</strong> DL001234</p>
+              <p><strong>Vehicle:</strong> BA-12-PA-1234</p>
+            </div>
+            <div class="driver-contact">
+              <p><i class="fa-solid fa-phone"></i> +977-9841234567</p>
+              <p><i class="fa-solid fa-envelope"></i> ram@example.com</p>
+              <p><i class="fa-solid fa-location-dot"></i> Kathmandu - Route A</p>
+            </div>
+            <div class="driver-status">
+              <span class="status active">active</span>
+              <button class="view-btn">View Details</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Complaints Section -->
+
+      <section id="complaints" class="content-section"><h2>Complaints</h2><p>Handle user complaints.</p>
+      <form id="complaintForm">
+        <div class="search-container">
+    <input type="text" id="search" placeholder="Search complaints by name...">
+  </div>
+
+  <div class="status-counts">
+    <span class="new">New: <span id="new-count">0</span></span>
+    <span class="assigned">Assigned: <span id="assigned-count">0</span></span>
+    <span class="closed">Closed: <span id="closed-count">0</span></span>
+  </div>
+
+    <input type="text" id="name" placeholder="Full Name" required />
+    <input type="date" id="date" required />
+
+    <select id="area" required>
+      <option value="">Select Area</option>
+      <option value="Kathmandu">Kathmandu</option>
+      <option value="Lalitpur">Lalitpur</option>
+      <option value="Bhaktapur">Bhaktapur</option>
+    </select>
+
+    <select id="street" required>
+      <option value="">Select Street</option>
+    </select>
+
+    <select id="title" required>
+      <option value="">Select Complaint Title</option>
+      <option value="Garbage Not Collected">Garbage Not Collected</option>
+      <option value="Overflowing Bins">Overflowing Bins</option>
+      <option value="Burning Waste">Burning Waste</option>
+      <option value="Illegal Dumping">Illegal Dumping</option>
+      <option value="Missed Pickup">Missed Pickup</option>
+    </select>
+
+    <select id="priority" required>
+      <option value="">Select Priority</option>
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+
+    <button type="submit">Submit Complaint</button>
+  </form>
+
+  
+
+  <div id="complaint-list">
+    <!-- Complaints will be shown here -->
+  </div>
+
+    </section>
+      
+        <section id="users" class="content-section"><h2>Users</h2><p>Manage registered users.</p>
+            <div class="container">
+    <div class="search-status">
+      <input type="text" placeholder="Search users..." />
+      <div class="status-summary">
+        <span class="active">Active: 4</span>
+        <span class="inactive">Inactive: 1</span>
+      </div>
+    </div>
+
+    <div class="user-list">
+      <!-- User Card -->
+      <div class="user-card">
+        <div class="user-info">
+          <div class="avatar" aria-label="User Icon">👤</div>
+          <div class="user-details">
+            <h3>Alice Johnson</h3>
+            <p class="user-id">User ID: U001</p>
+            <div class="contact-info">
+              <p><i>📧</i> alice@example.com</p>
+              <p><i>📞</i> +1234567890</p>
+              <p><i>📍</i> North Area</p>
+            </div>
+          </div>
+        </div>
+        <div class="user-meta">
+          <p><span class="complaints-count">2</span> <span class="complaints-label">Complaints</span></p>
+          <span class="status-badge active-badge">active</span>
+          <br />
+          <button class="btn-view-profile">View Profile</button>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <div class="user-info">
+          <div class="avatar" aria-label="User Icon">👤</div>
+          <div class="user-details">
+            <h3>Bob Smith</h3>
+            <p class="user-id">User ID: U002</p>
+            <div class="contact-info">
+              <p><i>📧</i> bob@example.com</p>
+              <p><i>📞</i> +1234567891</p>
+              <p><i>📍</i> South Area</p>
+            </div>
+          </div>
+        </div>
+        <div class="user-meta">
+          <p><span class="complaints-count">0</span> <span class="complaints-label">Complaints</span></p>
+          <span class="status-badge active-badge">active</span>
+          <br />
+          <button class="btn-view-profile">View Profile</button>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <div class="user-info">
+          <div class="avatar" aria-label="User Icon">👤</div>
+          <div class="user-details">
+            <h3>Carol Davis</h3>
+            <p class="user-id">User ID: U003</p>
+            <div class="contact-info">
+              <p><i>📧</i> carol@example.com</p>
+              <p><i>📞</i> +1234567892</p>
+              <p><i>📍</i> East Area</p>
+            </div>
+          </div>
+        </div>
+        <div class="user-meta">
+          <p><span class="complaints-count">1</span> <span class="complaints-label">Complaints</span></p>
+          <span class="status-badge inactive-badge">inactive</span>
+          <br />
+          <button class="btn-view-profile">View Profile</button>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <div class="user-info">
+          <div class="avatar" aria-label="User Icon">👤</div>
+          <div class="user-details">
+            <h3>David Wilson</h3>
+            <p class="user-id">User ID: U004</p>
+            <div class="contact-info">
+              <p><i>📧</i> david@example.com</p>
+              <p><i>📞</i> +1234567893</p>
+              <p><i>📍</i> West Area</p>
+            </div>
+          </div>
+        </div>
+        <div class="user-meta">
+          <p><span class="complaints-count">3</span> <span class="complaints-label">Complaints</span></p>
+          <span class="status-badge active-badge">active</span>
+          <br />
+          <button class="btn-view-profile">View Profile</button>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <div class="user-info">
+          <div class="avatar" aria-label="User Icon">👤</div>
+          <div class="user-details">
+            <h3>Eva Brown</h3>
+            <p class="user-id">User ID: U005</p>
+            <div class="contact-info">
+              <p><i>📧</i> eva@example.com</p>
+              <p><i>📞</i> +1234567894</p>
+              <p><i>📍</i> North Area</p>
+            </div>
+          </div>
+        </div>
+        <div class="user-meta">
+            <p><span class="complaints-count">0</span> <span class="complaints-label">Complaints</span></p>
+          <span class="status-badge active-badge">active</span>
+          <br />
+          <button class="btn-view-profile">View Profile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    </section>
+
+      <section id="settings" class="content-section"><h2>Settings</h2><p>System preferences and configurations.</p>
+    
+    <!-- System Configuration -->
+    <div class="card">
+      <h3>System Configuration</h3>
+      <div class="form-group">
+        <div>
+          <label for="systemName">System Name</label>
+          <input type="text" id="systemName" value="Garbage Management System" />
+        </div>
+        <div>
+          <label for="adminEmail">Admin Email</label>
+          <input type="email" id="adminEmail" value="admin@gms.com" />
+        </div>
+        <div class="full-width">
+          <label for="systemDescription">System Description</label>
+          <textarea id="systemDescription">Municipal waste management and tracking system</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Settings -->
+    <div class="card">
+      <h3>Notification Settings</h3>
+      <div class="toggle-group">
+        <div class="toggle-item">
+          <label>Email Notifications</label>
+          <label class="switch">
+            <input type="checkbox" id="emailNotif" checked>
+            <span class="slider"></span>
+          </label>
+          <p class="desc">Receive email alerts for new complaints</p>
+        </div>
+        <div class="toggle-item">
+          <label>SMS Notifications</label>
+          <label class="switch">
+            <input type="checkbox" id="smsNotif">
+            <span class="slider"></span>
+          </label>
+          <p class="desc">Receive SMS alerts for urgent issues</p>
+        </div>
+        <div class="toggle-item">
+          <label>Dashboard Alerts</label>
+          <label class="switch">
+            <input type="checkbox" id="dashNotif" checked>
+            <span class="slider"></span>
+          </label>
+          <p class="desc">Show real-time alerts on dashboard</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="card">
+      <h3>Security Settings</h3>
+      <div class="form-group">
+        <div class="full-width">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" placeholder="Enter current password" />
+        </div>
+        <div>
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" placeholder="Enter new password" />
+        </div>
+        <div>
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm new password" />
+        </div>
+      </div>
+      <button class="btn primary" onclick="updatePassword()">Update Password</button>
+    </div>
+
+    <!-- Email Configuration -->
+    <div class="card">
+      <h3>Email Configuration</h3>
+      <div class="form-group">
+        <div>
+          <label for="smtpServer">SMTP Server</label>
+          <input type="text" id="smtpServer" value="smtp.gmail.com" />
+        </div>
+        <div>
+          <label for="smtpPort">SMTP Port</label>
+          <input type="text" id="smtpPort" value="587" />
+        </div>
+        <div>
+          <label for="emailUsername">Email Username</label>
+          <input type="email" id="emailUsername" value="your-email@domain.com" />
+        </div>
+        <div>
+          <label for="emailPassword">Email Password</label>
+          <input type="password" id="emailPassword" placeholder="App password" />
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        <button class="btn secondary" onclick="resetDefaults()">Reset to Default</button>
+      </div>
+    </div>
+  </div>
+
+
+    </section>
+    </main>
+  </div>
+
+  <!-- Link to JS files -->
+  <script src="adminscript.js"></script>
+  <script src="create-bin.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>
