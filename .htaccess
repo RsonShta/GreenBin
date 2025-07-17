@@ -1,8 +1,14 @@
 RewriteEngine On
+RewriteBase /GreenBin/
 
-# Redirect /login to /pages/login.php
-RewriteRule ^login$ /pages/login.php [L,QSA]
+# Prevent rewriting existing files or directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 
-# Similarly for register, dashboard, etc.
-RewriteRule ^register$ /pages/register.php [L,QSA]
-RewriteRule ^dashboard$ /pages/dashboard.php [L,QSA]
+RewriteRule ^login/?$ pages/login.php [L,QSA]
+RewriteRule ^register/?$ pages/register.php [L,QSA]
+RewriteRule ^dashboard/?$ pages/dashboard.php [L,QSA]
+RewriteRule ^admin/?$ pages/adminDashboard.php [L,QSA]
+RewriteRule ^home/?$ pages/home.php [L,QSA]
+RewriteRule ^superadmin/?$ pages/superadmin.php [L,QSA]
+RewriteRule ^lang/?$ pages/lang.php [L,QSA]

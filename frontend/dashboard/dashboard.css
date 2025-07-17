@@ -1,63 +1,132 @@
+/* Reset & Basics */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    /* Add minimal styles for your dynamic classes */
-    .upload-area {
-      border: 2px dashed #9ca3af;
-      background: #fafafa;
-      cursor: pointer;
-      padding: 1rem;
-      text-align: center;
-      border-radius: 0.375rem;
-      transition: border-color 0.3s, background-color 0.3s;
-    }
-    .file-info {
-      font-size: 0.85rem;
-      color: #4b5563;
-    }
-    .report-card {
-      display: flex;
-      gap: 1rem;
-      border: 1px solid #d1d5db;
-      padding: 1rem;
-      border-radius: 0.375rem;
-      background: white;
-    }
-    .report-image img {
-      width: 120px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 0.375rem;
-    }
-    .report-title {
-      font-weight: 600;
-      font-size: 1.125rem;
-      margin-bottom: 0.25rem;
-    }
-    .report-description {
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-      color: #4b5563;
-    }
-    .report-meta {
-      font-size: 0.8rem;
-      color: #6b7280;
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-    .divider {
-      width: 1px;
-      height: 1rem;
-      background: #d1d5db;
-    }
-    .status-pending {
-      color: #d97706; /* amber-600 */
-      font-weight: 700;
-    }
-    .status-resolved {
-      color: #16a34a; /* green-600 */
-      font-weight: 700;
-    }
-    .status-in-progress {
-      color: #2563eb; /* blue-600 */
-      font-weight: 700;
-    }
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f3f4f6; /* Tailwind gray-100 */
+  padding: 1rem;
+  font-size: 12px;
+}
+
+/* Upload Area */
+.upload-area {
+  border: 2px dashed #9ca3af;
+  background: #fafafa;
+  cursor: pointer;
+  padding: 1.5rem; /* Increased for better space */
+  text-align: center;
+  border-radius: 0.375rem;
+  transition: border-color 0.3s, background-color 0.3s;
+  font-size: 1rem; /* More readable */
+}
+
+/* Upload File Info */
+.file-info {
+  font-size: 0.85rem;
+  color: #4b5563;
+  margin-top: 0.5rem;
+}
+
+/* Report Card */
+.report-card {
+  display: flex;
+  flex-wrap: wrap; /* Responsive */
+  gap: 1rem;
+  border: 1px solid #d1d5db;
+  padding: 1.25rem; /* More spacious */
+  border-radius: 0.375rem;
+  background: white;
+  align-items: center;
+}
+
+/* Report Image */
+.report-image img {
+  width: 140px; /* Increased */
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+}
+
+/* Report Title */
+.report-title {
+  font-weight: 600;
+  font-size: 1.25rem; /* Enhanced size */
+  margin-bottom: 0.25rem;
+}
+
+/* Report Description */
+.report-description {
+  font-size: 1rem; /* More readable */
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+}
+
+/* Report Meta Info */
+.report-meta {
+  font-size: 0.9rem; /* Slightly larger */
+  color: #6b7280;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+}
+
+/* Divider */
+.divider {
+  width: 1px;
+  height: 1.25rem; /* Taller */
+  background: #cbd5e1; /* Softer tone */
+}
+
+/* Status Classes */
+.status-pending {
+  color: #d97706; /* amber-600 */
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.2px;
+}
+
+.status-resolved {
+  color: #16a34a; /* green-600 */
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.2px;
+}
+
+.status-in-progress {
+  color: #2563eb; /* blue-600 */
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.2px;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .upload-area {
+    padding: 1.25rem;
+  }
+
+  .report-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .report-image img {
+    width: 100%;
+    height: auto;
+  }
+
+  .report-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .divider {
+    display: none;
+  }
+}

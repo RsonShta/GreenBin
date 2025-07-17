@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    // Clear previous errors
     messageDiv.textContent = "";
     emailError.textContent = "";
     passwordError.textContent = "";
@@ -43,16 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.ok) {
         messageDiv.style.color = "green";
         messageDiv.textContent = data.message || "Login successful!";
-
-        // Redirect based on role from DB
         setTimeout(() => {
           if (data.role === "admin") {
-            window.location.href =
-              "/GreenBin/pages/adminDashboard.php";
+            window.location.href = "/GreenBin/admin";
           } else if (data.role === "user") {
-            window.location.href = "/GreenBin/pages/dashboard.php";
+            window.location.href = "/GreenBin/dashboard";
           } else {
-            window.location.href = "/GreenBin/pages/home.php";
+            window.location.href = "/GreenBin/home";
           }
         }, 1000);
       } else {

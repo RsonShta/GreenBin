@@ -4,6 +4,7 @@ require __DIR__ . '/includes/db.php';
 header('Content-Type: application/json');
 session_start();
 
+// Sanitize helper
 function sanitize($input): string
 {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
@@ -35,9 +36,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+    if (!preg_match('/^(98|97)\d{8}$/', $phone)) {
+        http_response_code(400);
+        echo json_encode(['message' => 'Phone number must start with 98 or 97 and be exactly 10 digits.']);
+        exit;
+    }
 
+
+    // Check for existing email or phone number
     try {
+        $checkStmt = $pdo->prepare("SELECT email_id, phone_number FROM users WHERE email_id = :email OR phone_number = :phone");
+        $checkStmt->execute([':email' => $email, ':phone' => $phone]);
+        $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            if ($existing['email_id'] === $email) {
+                http_response_code(409);
+                echo json_encode(['message' => 'Email already registered.']);
+                exit;
+            }
+            if ($existing['phone_number'] === $phone) {
+                http_response_code(409);
+                echo json_encode(['message' => 'Phone number already registered.']);
+                exit;
+            }
+        }
+
+        // All good, insert user
+        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+
         $stmt = $pdo->prepare("
             INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country, role)
             VALUES (:first_name, :last_name, :email, :password_hash, :phone, :country, :role)
@@ -49,26 +76,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':email' => $email,
             ':password_hash' => $passwordHash,
             ':phone' => $phone,
-            ':country' => "NP",
+            ':country' => 'NP',
             ':role' => 'user'
         ]);
 
-        $userId = $pdo->lastInsertId(); // Get new user ID
+        $userId = $pdo->lastInsertId();
 
         http_response_code(201);
         echo json_encode([
             'message' => 'Registration successful.',
-            'user_id' => $userId
+            'user_id' => $userId,
+            'role' => 'user'
         ]);
     } catch (PDOException $e) {
-        if ($e->errorInfo[1] === 1062) {
-            http_response_code(409);
-            echo json_encode(['message' => 'Email already registered.']);
-        } else {
-            error_log("Registration error: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['message' => 'Internal Server Error.']);
-        }
+        error_log("Registration Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['message' => 'Internal Server Error.']);
     }
 } else {
     http_response_code(405);

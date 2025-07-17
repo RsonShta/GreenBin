@@ -12,7 +12,7 @@ define('SESSION_TIMEOUT', 1800); // 30 minutes
  * @param array $allowedRoles List of roles allowed to access the page
  * @param string $redirectPath Path to redirect if unauthorized
  */
-function requireRole(array $allowedRoles, string $redirectPath = '/GreenBin/frontend/login/login.html')
+function requireRole(array $allowedRoles, string $redirectPath = '/GreenBin/login')
 {
     // Not logged in at all
     if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role'])) {

@@ -34,8 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
       phoneError.textContent = "Phone number is required.";
       return false;
     }
-    if (!/^\d{10}$/.test(phone)) {
-      phoneError.textContent = "Phone number must be exactly 10 digits.";
+    // Phone must be exactly 10 digits AND start with 98
+    if (!/^(98|97)\d{8}$/.test(phone)) {
+      phoneError.textContent =
+        "Phone number must start with 98 or 97 and be exactly 10 digits.";
       return false;
     }
     phoneError.textContent = "";
@@ -103,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.ok) {
         const userId = result.user_id;
-        window.location.href = `/GreenBin/frontend/dashboard/dashboard.php`;
+        window.location.href = `/GreenBin/dashboard`;
       } else {
         alert("Error: " + result.message);
       }
