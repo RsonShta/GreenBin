@@ -24,6 +24,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const reportsList = document.getElementById("reportsList"); // Container where reports are displayed
   const noReports = document.getElementById("noReports"); // Element showing "No reports found" message
 
+  // Toast container for notifications
+  let toastTimeout = null;
+  function showToast(message) {
+    let toast = document.getElementById("toastNotification");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "toastNotification";
+      toast.style.position = "fixed";
+      toast.style.bottom = "20px";
+      toast.style.right = "20px";
+      toast.style.background = "#2e7d32";
+      toast.style.color = "white";
+      toast.style.padding = "10px 20px";
+      toast.style.borderRadius = "6px";
+      toast.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+      toast.style.fontWeight = "600";
+      toast.style.zIndex = "9999";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = "1";
+
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      toast.style.opacity = "0";
+    }, 3000);
+  }
+
   // === State: Map to track currently displayed reports and their content hashes
   // Keys: report_id, Values: simple string hash representing report content to detect changes
   let currentReportsMap = new Map();
@@ -81,19 +109,17 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {boolean} replaceExisting - If true, update the existing card instead of creating a new one
    */
   function addReportToUI(report, replaceExisting = false) {
-    // Determine image URL (use default if none)
     const imageUrl = report.image_path
       ? `/GreenBin/uploads/${report.image_path}`
       : "/GreenBin/frontend/img/default-report.png";
 
-    // Try to find existing card for this report ID in the DOM
     let existingCard = reportsList.querySelector(
       `[data-report-id="${report.report_id}"]`
     );
 
     if (replaceExisting && existingCard) {
-      // If we want to update an existing card, modify its content
       existingCard.querySelector("img").src = imageUrl;
+      existingCard.querySelector("img").loading = "lazy"; // lazy load images
       existingCard.querySelector("h3").textContent = escapeHtml(report.title);
       existingCard.querySelector("p").innerHTML = nl2br(
         escapeHtml(report.description)
@@ -106,16 +132,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Otherwise, create a new card element
+    // Create new card element
     const reportCard = document.createElement("div");
     reportCard.className =
       "report-card flex gap-4 border p-4 rounded bg-white shadow-sm";
     reportCard.dataset.reportId = report.report_id;
 
-    // Set inner HTML for the card
     reportCard.innerHTML = `
       <div class="report-image">
-        <img src="${imageUrl}" alt="Report image" class="w-30 h-20 object-cover rounded" />
+        <img src="${imageUrl}" alt="Report image" loading="lazy" class="w-30 h-20 object-cover rounded" />
       </div>
       <div class="report-content flex-1">
         <h3 class="font-semibold text-lg mb-1">${escapeHtml(report.title)}</h3>
@@ -134,34 +159,26 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    // Bind click event for edit button to open modal with current report data
     reportCard
       .querySelector(".edit-btn")
       .addEventListener("click", () => window.openEditModal(report));
 
-    // Bind click event for delete button to delete report
     reportCard
       .querySelector(".delete-btn")
       .addEventListener("click", () => deleteReport(report.report_id));
 
-    // Prepend new card to the top of the reports list
     reportsList.prepend(reportCard);
 
-    // Ensure UI reflects that reports exist
     noReports.style.display = "none";
     reportsList.style.display = "grid";
   }
 
   /**
-   * Load all user reports from server and update UI intelligently:
-   * - Remove cards that no longer exist
-   * - Add new cards
-   * - Update cards with changed content
+   * Load all user reports from server and update UI intelligently.
    */
   async function loadUserReports() {
     try {
       const res = await fetch("/GreenBin/backend/getReports.php");
-
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
 
@@ -169,14 +186,13 @@ document.addEventListener("DOMContentLoaded", () => {
         noReports.style.display = "none";
         reportsList.style.display = "grid";
 
-        // Build a map of reports fetched from server (report_id => report object)
         const fetchedReportsMap = new Map();
         data.reports.forEach((report) => {
           fetchedReportsMap.set(report.report_id, report);
         });
 
-        // Remove cards that are no longer on server (deleted)
-        for (const [existingId] of currentReportsMap.entries()) {
+        // Remove deleted reports
+        for (const existingId of currentReportsMap.keys()) {
           if (!fetchedReportsMap.has(existingId)) {
             const cardToRemove = reportsList.querySelector(
               `[data-report-id="${existingId}"]`
@@ -186,24 +202,18 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
 
-        // Add new cards or update changed cards
+        // Add new or update changed reports
         for (const report of data.reports) {
-          const reportId = report.report_id;
           const newHash = hashReport(report);
-
-          if (!currentReportsMap.has(reportId)) {
-            // New report - add card
+          if (!currentReportsMap.has(report.report_id)) {
             addReportToUI(report);
-            currentReportsMap.set(reportId, newHash);
-          } else if (currentReportsMap.get(reportId) !== newHash) {
-            // Existing report but content changed - update card
+            currentReportsMap.set(report.report_id, newHash);
+          } else if (currentReportsMap.get(report.report_id) !== newHash) {
             addReportToUI(report, true);
-            currentReportsMap.set(reportId, newHash);
+            currentReportsMap.set(report.report_id, newHash);
           }
-          // If hash matches, do nothing (no changes)
         }
       } else {
-        // No reports found - clear UI and state
         noReports.style.display = "block";
         reportsList.style.display = "none";
         reportsList.innerHTML = "";
@@ -217,8 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Delete a report by its ID, update UI and state map accordingly
-   * @param {number} reportId
+   * Delete a report by its ID.
    */
   async function deleteReport(reportId) {
     if (!confirm("Are you sure you want to delete this report?")) return;
@@ -232,47 +241,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
       if (result.success) {
-        // Remove card from UI and from currentReportsMap state
         const card = reportsList.querySelector(
           `[data-report-id="${reportId}"]`
         );
         if (card) card.remove();
         currentReportsMap.delete(reportId);
 
-        // If no reports left, show noReports message
         if (reportsList.children.length === 0) {
           noReports.style.display = "block";
           reportsList.style.display = "none";
         }
+
+        showToast("Report deleted successfully.");
       }
     } catch (err) {
       console.error("Delete failed:", err);
+      showToast("Failed to delete report.");
     }
   }
 
   /**
-   * Optionally try to get user's geolocation and append it as hidden input to form
+   * Try to get user's geolocation and append as hidden input.
    */
   function tryGeolocation() {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      console.warn("Geolocation not supported");
+      return;
+    }
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
+        // Remove any existing location inputs first
+        const existingInput = form.querySelector('input[name="location"]');
+        if (existingInput) existingInput.remove();
+
         const hiddenInput = document.createElement("input");
         hiddenInput.type = "hidden";
         hiddenInput.name = "location";
         hiddenInput.value = coords;
         form.appendChild(hiddenInput);
       },
-      () => console.error("Geolocation unavailable"),
+      () => {
+        console.error("Geolocation unavailable");
+        showToast("Unable to get location. You can enter location manually.");
+      },
       { timeout: 10000 }
     );
   }
 
   /**
    * Handle submission of new report form via AJAX.
-   * On success, immediately adds the new report card to UI and updates state map.
    */
   if (form) {
     form.addEventListener("submit", async (e) => {
@@ -295,9 +314,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "Click to upload or drag and drop";
           errorBox.classList.add("hidden");
 
-          // Add new report to UI and update state
           addReportToUI(data.report);
           currentReportsMap.set(data.report.report_id, hashReport(data.report));
+          showToast("Report submitted successfully.");
         } else {
           errorBox.textContent = data.message || "Submission failed.";
           errorBox.classList.remove("hidden");
@@ -309,7 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Handle file input UI updates
+  // File input UI updates
   if (uploadArea && fileInput) {
     uploadArea.addEventListener("click", () => fileInput.click());
     fileInput.addEventListener("change", () => {
@@ -318,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Edit modal open/close handlers ===
+  // Edit modal open/close handlers
   window.openEditModal = function (report) {
     document.getElementById("editModal").classList.remove("hidden");
     document.getElementById("editReportId").value = report.report_id;
@@ -335,7 +354,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Handle submission of the edit form via AJAX.
-   * On success, updates the corresponding report card instantly.
    */
   document
     .getElementById("editReportForm")
@@ -363,11 +381,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (result.success) {
           closeEditModal();
-          addReportToUI(result.report, true); // update card instantly
+          addReportToUI(result.report, true);
           currentReportsMap.set(
             result.report.report_id,
             hashReport(result.report)
-          ); // update state map
+          );
+          showToast("Report updated successfully.");
         } else {
           errorBox.textContent = result.message || "Failed to update.";
           errorBox.classList.remove("hidden");
@@ -378,10 +397,39 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-  // Initial load of reports and try geolocation
+  /**
+   * Load dashboard stats and update UI
+   */
+  async function loadDashboardStats() {
+    try {
+      const res = await fetch("/GreenBin/backend/getStats.php");
+      if (!res.ok) throw new Error("Network response was not ok");
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById("totalReports").textContent =
+          data.stats.totalReports;
+        document.getElementById("resolutionRate").textContent =
+          data.stats.resolutionRate + "%";
+        document.getElementById("resolvedCount").textContent =
+          data.stats.resolvedCount + " resolved";
+        document.getElementById("co2Reduction").textContent =
+          data.stats.co2Reduction.toFixed(1) + " kg";
+        document.getElementById("communityPoints").textContent =
+          data.stats.communityPoints;
+      }
+    } catch (err) {
+      console.error("Stats update failed:", err);
+    }
+  }
+
+  // Initial load and geolocation attempt
   tryGeolocation();
   loadUserReports();
+  loadDashboardStats();
 
-  // Set interval to poll every 1 second and update UI accordingly
-  setInterval(loadUserReports, 1000);
+  // Poll every 5 seconds instead of 1 second to reduce server load
+  setInterval(() => {
+    loadUserReports();
+    loadDashboardStats();
+  }, 5000);
 });

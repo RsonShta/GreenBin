@@ -126,29 +126,29 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center text-gray-800">
       <div class="bg-green-100 rounded p-4 shadow">
-        <h2 class="text-xl font-semibold"><?= $lang === 'np' ? 'कुल रिपोर्टहरू' : 'Total Reports' ?></h2>
-        <p class="text-3xl font-bold mt-2"><?= $totalReports ?></p>
-        <p class="text-sm text-gray-600 mt-1">
-          <?= $lang === 'np' ? "{$pendingCount} पेंडिङ, {$inProgressCount} प्रक्रियामा" : "{$pendingCount} pending, {$inProgressCount} in progress" ?>
+        <h2 class="text-xl font-semibold">Total Reports</h2>
+        <p id="totalReports" class="text-3xl font-bold mt-2"><?= $totalReports ?></p>
+        <p id="statusCounts" class="text-sm text-gray-600 mt-1">
+          <?= "{$pendingCount} pending, {$inProgressCount} in progress" ?>
         </p>
       </div>
       <div class="bg-green-100 rounded p-4 shadow">
-        <h2 class="text-xl font-semibold"><?= $lang === 'np' ? 'समाधान दर' : 'Resolution Rate' ?></h2>
-        <p class="text-3xl font-bold mt-2"><?= $resolutionRate ?>%</p>
-        <p class="text-sm text-gray-600 mt-1">
-          <?= $lang === 'np' ? "{$resolvedCount} समाधान भयो" : "{$resolvedCount} resolved" ?></p>
+        <h2 class="text-xl font-semibold">Resolution Rate</h2>
+        <p id="resolutionRate" class="text-3xl font-bold mt-2"><?= $resolutionRate ?>%</p>
+        <p id="resolvedCount" class="text-sm text-gray-600 mt-1"><?= $resolvedCount ?> resolved</p>
       </div>
       <div class="bg-green-100 rounded p-4 shadow">
-        <h2 class="text-xl font-semibold"><?= $lang === 'np' ? 'पर्यावरण प्रभाव' : 'Environmental Impact' ?></h2>
-        <p class="text-3xl font-bold mt-2"><?= number_format($co2Reduction, 1) ?> kg</p>
-        <p class="text-sm text-gray-600 mt-1"><?= $lang === 'np' ? 'CO₂ कमी अनुमानित' : 'CO₂ reduction estimated' ?></p>
+        <h2 class="text-xl font-semibold">Environmental Impact</h2>
+        <p id="co2Reduction" class="text-3xl font-bold mt-2"><?= number_format($co2Reduction, 1) ?> kg</p>
+        <p class="text-sm text-gray-600 mt-1">CO₂ reduction estimated</p>
       </div>
       <div class="bg-green-100 rounded p-4 shadow">
-        <h2 class="text-xl font-semibold"><?= $lang === 'np' ? 'समुदाय अंकहरू' : 'Community Points' ?></h2>
-        <p class="text-3xl font-bold mt-2"><?= $communityPoints ?></p>
-        <p class="text-sm text-gray-600 mt-1"><?= $lang === 'np' ? 'इको-वारियर स्तर' : 'Eco-warrior level' ?></p>
+        <h2 class="text-xl font-semibold">Community Points</h2>
+        <p id="communityPoints" class="text-3xl font-bold mt-2"><?= $communityPoints ?></p>
+        <p class="text-sm text-gray-600 mt-1">Eco-warrior level</p>
       </div>
     </div>
+
 
     <!-- Navigation Tabs -->
     <nav class="flex justify-center mt-6 space-x-8 text-green-700 font-semibold text-lg">

@@ -104,14 +104,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 class="border px-3 py-1 rounded-md text-gray-700 hover:bg-gray-100 transition">
                 🌐 <?= $lang === 'en' ? 'नेपाली' : 'English' ?>
             </a>
-            <a href="/GreenBin/dashboard" class="text-green-700 hover:underline">
-                <?= $lang === 'np' ? 'ड्यासबोर्डमा फर्कनुहोस्' : 'Back to Dashboard' ?>
-            </a>
+
         </div>
     </header>
 
-    <main class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-6 mb-10">
-        <h2 class="text-xl font-bold mb-6"><?= $lang === 'np' ? 'प्रोफाइल सम्पादन गर्नुहोस्' : 'Edit Your Profile' ?>
+    <main class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-2 mb-10">
+        <a href="/GreenBin/dashboard"
+            class="inline-block text-green-700 hover:text-white hover:bg-green-700 transition text-xs border border-green-700 rounded px-1.5 py-0.5 mb-4">
+            <?= $lang === 'np' ? 'ड्यासबोर्डमा फर्कनुहोस्' : '<-- Back to Dashboard' ?>
+        </a>
+        <h2 class="text-xl font-bold mt-2 mb-6">
+            <?= $lang === 'np' ? 'प्रोफाइल सम्पादन गर्नुहोस्' : 'Edit Your Profile' ?>
         </h2>
 
         <?php if ($error): ?>
