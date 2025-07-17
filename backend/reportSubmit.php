@@ -1,6 +1,5 @@
 <?php
 // reportSubmit.php
-
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/error.log');
@@ -32,7 +31,6 @@ if (empty($title) || empty($description)) {
     exit;
 }
 
-// ================== File Upload ==================
 $uploadedImagePath = null;
 
 if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
@@ -42,7 +40,6 @@ if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     $fileType = mime_content_type($fileTmpPath);
 
     $allowedTypes = ['image/png', 'image/jpeg', 'image/gif'];
-
     if (!in_array($fileType, $allowedTypes)) {
         ob_end_clean();
         echo json_encode(['success' => false, 'message' => 'Invalid file type. Only PNG, JPG, GIF allowed.']);
@@ -73,45 +70,37 @@ if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     $uploadedImagePath = $newFileName;
 }
 
-// ================== Insert Into DB ==================
 try {
     $pdo->beginTransaction();
-
-    $stmt = $pdo->prepare("INSERT INTO reports (user_id, title, description, image_path, location, status, date, created_at, updated_at) 
-        VALUES (?, ?, ?, ?, ?, 'pending', CURDATE(), NOW(), NOW())");
-
-    $stmt->execute([
-        $_SESSION['user_id'],
-        $title,
-        $description,
-        $uploadedImagePath,
-        $location
-    ]);
-
+    $stmt = $pdo->prepare("
+        INSERT INTO reports (user_id, title, description, image_path, location, status, date, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 'pending', CURDATE(), NOW(), NOW())
+    ");
+    $stmt->execute([$_SESSION['user_id'], $title, $description, $uploadedImagePath, $location]);
     $newReportId = $pdo->lastInsertId();
-
     $pdo->commit();
+
+    $stmtFetch = $pdo->prepare("SELECT * FROM reports WHERE report_id = ?");
+    $stmtFetch->execute([$newReportId]);
+    $newReport = $stmtFetch->fetch(PDO::FETCH_ASSOC);
 
     ob_end_clean();
     echo json_encode([
         'success' => true,
         'message' => 'Report submitted successfully',
         'report' => [
-            'report_id' => (int)$newReportId,
-            'title' => $title,
-            'description' => $description,
-            'image_path' => $uploadedImagePath,  // Fixed variable name
-            'location' => $location,
-            'status' => 'pending',
-            'date' => date(format: 'Y-m-d')
+            'report_id' => (int)$newReport['report_id'],
+            'title' => htmlspecialchars($newReport['title']),
+            'description' => htmlspecialchars($newReport['description']),
+            'location' => htmlspecialchars($newReport['location']),
+            'status' => $newReport['status'],
+            'date' => $newReport['date'],
+            'image_path' => $newReport['image_path']
         ]
     ]);
-    exit;
 } catch (PDOException $e) {
     $pdo->rollBack();
     error_log("DB Error in reportSubmit.php: " . $e->getMessage());
-
     ob_end_clean();
     echo json_encode(['success' => false, 'message' => 'Database error occurred.']);
-    exit;
 }
