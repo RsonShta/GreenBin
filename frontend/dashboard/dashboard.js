@@ -1,4 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // === NEW: Show/Hide Report Submission Form on button clicks ===
+  const showFormBtn = document.getElementById("showReportFormBtn");
+  const reportFormSection = document.getElementById("reportFormSection");
+  const cancelReportFormBtn = document.getElementById("cancelReportFormBtn");
+
+  if (showFormBtn && reportFormSection) {
+    showFormBtn.addEventListener("click", () => {
+      reportFormSection.classList.remove("hidden");
+      reportFormSection.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  if (cancelReportFormBtn && reportFormSection) {
+    cancelReportFormBtn.addEventListener("click", () => {
+      reportFormSection.classList.add("hidden");
+    });
+  }
+
   // === DOM ELEMENTS ===
   const form = document.querySelector(".form-container"); // The new report submission form
   const uploadArea = document.getElementById("uploadArea"); // The upload box area
@@ -364,6 +382,6 @@ document.addEventListener("DOMContentLoaded", () => {
   tryGeolocation();
   loadUserReports();
 
-  // Set interval to poll every 30 seconds and update UI
+  // Set interval to poll every 1 second and update UI accordingly
   setInterval(loadUserReports, 1000);
 });

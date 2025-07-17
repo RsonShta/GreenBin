@@ -2,7 +2,7 @@
 session_start();
 if (isset($_SESSION['user_id'])) {
   $role = $_SESSION['user_role'];
-  header("Location: /GreenBin/pages/" . ($role === 'admin' ? "adminDashboard" : "dashboard"));
+  header("Location: /GreenBin/" . ($role === 'admin' ? "adminDashboard" : "dashboard"));
   exit;
 }
 ?>

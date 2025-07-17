@@ -64,6 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // All good, insert user
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+        $first_name = ucfirst(strtolower(trim($_POST['first_name'])));
+        $last_name = ucfirst(strtolower(trim($_POST['last_name'])));
+        $email = strtolower(trim($_POST['email']));
+
 
         $stmt = $pdo->prepare("
             INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country, role)
