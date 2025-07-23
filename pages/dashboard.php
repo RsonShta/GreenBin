@@ -1,18 +1,7 @@
+<?php require_once 'includes/user_header.php'; ?>
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
-requireRole(['superAdmin', 'admin', 'user']);
-
-$userName = htmlspecialchars($_SESSION['user_name']);
-$userRole = $_SESSION['user_role'];
-
-require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/db.php';
-
-// 🌐 Language Switch
-if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'np'])) {
-  $_SESSION['lang'] = $_GET['lang'];
-}
-$lang = $_SESSION['lang'] ?? 'en';
-
+require_once $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
+requireRole(['user']);
 // ==================== ✅ DASHBOARD STATS QUERIES ====================
 $userId = $_SESSION['user_id'] ?? 0;
 
@@ -45,69 +34,8 @@ $communityPoints = $resolvedCount * 10;
 
 // Resolution Rate
 $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 100, 1) : 0.0;
+
 ?>
-
-<!DOCTYPE html>
-<html lang="<?= $lang ?>">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><?= $lang === 'np' ? 'ड्यासबोर्ड - हरित नेपाल' : 'Dashboard - हरित नेपाल' ?></title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link href="/GreenBin/frontend/dashboard/dashboard.css" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            inter: ['Inter', 'sans-serif']
-          },
-          colors: {
-            primary: '#2e7d32',
-            dark: '#1b5e20',
-            light: '#f0fdf4'
-          }
-        }
-      }
-    }
-  </script>
-</head>
-
-<body class="bg-gray-100 min-h-screen m-0 p-0">
-
-  <!-- Header -->
-  <header class="bg-white shadow-sm border-b border-gray-200 py-4 px-6 flex justify-between items-center">
-    <!-- Logo & Name -->
-    <div class="flex items-center gap-3">
-      <img src="/GreenBin/frontend/img/mountain.png" class="w-8 h-8" alt="Logo" />
-      <div>
-        <h1 class="text-lg font-bold text-green-700 leading-tight">हरित नेपाल</h1>
-        <span class="text-xs text-gray-500">GreenBin Nepal</span>
-      </div>
-    </div>
-
-    <!-- Right Section: Language | Profile | Logout -->
-    <div class="flex items-center gap-4 text-sm">
-      <!-- 🌐 Language Switch -->
-      <a href="?lang=<?= $lang === 'en' ? 'np' : 'en' ?>"
-        class="text-xs px-2 py-1 border rounded hover:bg-gray-100 transition">
-        🌐 <?= $lang === 'en' ? 'नेपाली' : 'English' ?>
-      </a>
-
-      <!-- 👤 Profile View -->
-      <a href="/GreenBin/profile" class="flex items-center gap-1 text-gray-700 hover:text-green-700 transition">
-        <i class="fas fa-user-circle"></i> <?= $lang === 'np' ? 'प्रोफाइल' : 'Profile' ?>
-      </a>
-
-      <!-- 🚪 Logout -->
-      <a href="/GreenBin/backend/logout.php"
-        class="border px-3 py-1 rounded-md text-gray-800 hover:bg-gray-100 flex items-center gap-1 text-sm transition">
-        <i class="fas fa-sign-out-alt"></i> <?= $lang === 'np' ? 'लग आउट' : 'Logout' ?>
-      </a>
-    </div>
-  </header>
 
   <!-- Main Content -->
   <main class="max-w-[100%] mx-auto p-6">
@@ -152,11 +80,11 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
 
     <!-- Navigation Tabs -->
     <nav class="flex justify-center mt-6 space-x-8 text-green-700 font-semibold text-lg">
-      <a href="#" class="hover:underline"><?= $lang === 'np' ? 'रिपोर्टहरू' : 'Reports' ?></a>
-      <a href="#" class="hover:underline"><?= $lang === 'np' ? 'विश्लेषण' : 'Analytics' ?></a>
-      <a href="#" class="hover:underline"><?= $lang === 'np' ? 'समुदाय' : 'Community' ?></a>
-      <a href="#" class="hover:underline"><?= $lang === 'np' ? 'उपलब्धिहरू' : 'Achievements' ?></a>
-      <a href="#" class="hover:underline"><?= $lang === 'np' ? 'इको सुझावहरू' : 'Eco Tips' ?></a>
+      <a href="#" id="reportsTab" class="tab-link border-b-2 border-green-700 pb-1"><?= $lang === 'np' ? 'रिपोर्टहरू' : 'Reports' ?></a>
+      <a href="#" id="analyticsTab" class="tab-link hover:underline"><?= $lang === 'np' ? 'विश्लेषण' : 'Analytics' ?></a>
+      <a href="#" class="tab-link hover:underline"><?= $lang === 'np' ? 'समुदाय' : 'Community' ?></a>
+      <a href="#" class="tab-link hover:underline"><?= $lang === 'np' ? 'उपलब्धिहरू' : 'Achievements' ?></a>
+      <a href="#" class="tab-link hover:underline"><?= $lang === 'np' ? 'इको सुझावहरू' : 'Eco Tips' ?></a>
     </nav>
 
     <!-- Report Submission Form (Initially Hidden) -->
@@ -184,6 +112,21 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
           <textarea id="description" name="description"
             placeholder="<?= $lang === 'np' ? 'विवरण लेख्नुहोस्' : 'Description' ?>" required
             class="w-full border border-gray-300 p-2 rounded-md focus:ring focus:ring-green-200 focus:outline-none h-32"></textarea>
+        </div>
+
+        <div>
+          <label for="location" class="block text-sm font-medium mb-1">
+            <?= $lang === 'np' ? 'स्थान' : 'Location' ?>
+          </label>
+          <div class="flex items-center gap-2">
+            <input id="location" name="location" type="text"
+              placeholder="<?= $lang === 'np' ? 'स्थान प्रविष्ट गर्नुहोस् वा पत्ता लगाउनुहोस्' : 'Enter location or get automatically' ?>"
+              class="w-full border border-gray-300 p-2 rounded-md focus:ring focus:ring-green-200 focus:outline-none" />
+            <button type="button" id="getLocationBtn"
+              class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
+              <i class="fas fa-map-marker-alt"></i>
+            </button>
+          </div>
         </div>
 
         <div>
@@ -215,7 +158,7 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
     </section>
 
     <!-- Your Reports Section -->
-    <section class="max-w-50xl mx-auto bg-white border rounded-lg shadow p-6">
+    <section id="reportsSection" class="max-w-50xl mx-auto bg-white border rounded-lg shadow p-6">
       <h2 class="text-xl font-semibold text-gray-800 mb-4">
         <?= $lang === 'np' ? 'तपाईंको रिपोर्टहरू' : 'Your Reports' ?>
       </h2>
@@ -238,62 +181,154 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
       </div>
     </section>
 
+    <!-- Analytics Section -->
+    <section id="analyticsSection" class="max-w-7xl mx-auto space-y-6 hidden">
+      <!-- Analytics Header -->
+      <div class="bg-white border rounded-lg shadow p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">
+          <?= $lang === 'np' ? 'विश्लेषण ड्यासबोर्ड' : 'Analytics Dashboard' ?>
+        </h2>
+        <p class="text-gray-600">
+          <?= $lang === 'np' ? 'तपाईंको रिपोर्टिङ गतिविधि र प्रभावको विस्तृत दृश्य' : 'Detailed view of your reporting activity and impact' ?>
+        </p>
+      </div>
+
+      <!-- Performance Metrics -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600"><?= $lang === 'np' ? 'यस महिनाका रिपोर्टहरू' : 'This Month Reports' ?></p>
+              <p id="currentMonthReports" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+            <div id="monthlyChange" class="text-sm font-semibold"></div>
+          </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600"><?= $lang === 'np' ? 'औसत प्रतिक्रिया समय' : 'Avg Response Time' ?></p>
+              <p id="avgResponseTime" class="text-2xl font-bold text-gray-900">-</p>
+            </div>
+            <i class="fas fa-clock text-green-500 text-xl"></i>
+          </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600"><?= $lang === 'np' ? 'समाधान दर' : 'Resolution Rate' ?></p>
+              <p id="analyticsResolutionRate" class="text-2xl font-bold text-gray-900">0%</p>
+            </div>
+            <i class="fas fa-chart-pie text-yellow-500 text-xl"></i>
+          </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-purple-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600"><?= $lang === 'np' ? 'कुल CO₂ प्रभाव' : 'Total CO₂ Impact' ?></p>
+              <p id="totalCo2Impact" class="text-2xl font-bold text-gray-900">0 kg</p>
+            </div>
+            <i class="fas fa-leaf text-purple-500 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Status Distribution Chart -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold mb-4">
+            <?= $lang === 'np' ? 'स्थिति वितरण' : 'Status Distribution' ?>
+          </h3>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Monthly Trend Chart -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold mb-4">
+            <?= $lang === 'np' ? 'मासिक प्रवृत्ति' : 'Monthly Trend' ?>
+          </h3>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Activity Chart -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-lg font-semibold mb-4">
+          <?= $lang === 'np' ? 'साप्ताहिक गतिविधि' : 'Weekly Activity' ?>
+        </h3>
+        <div class="h-64">
+          <canvas id="weeklyChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Admin-only sections -->
+      <div id="adminAnalytics" class="space-y-6 hidden">
+        <!-- Top Locations -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold mb-4">
+            <?= $lang === 'np' ? 'शीर्ष स्थानहरू' : 'Top Locations' ?>
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full table-auto">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-2"><?= $lang === 'np' ? 'स्थान' : 'Location' ?></th>
+                  <th class="text-left py-2"><?= $lang === 'np' ? 'कुल रिपोर्टहरू' : 'Total Reports' ?></th>
+                  <th class="text-left py-2"><?= $lang === 'np' ? 'समाधान भएका' : 'Resolved' ?></th>
+                  <th class="text-left py-2"><?= $lang === 'np' ? 'दर' : 'Rate' ?></th>
+                </tr>
+              </thead>
+              <tbody id="topLocationsTable">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- User Activity -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold mb-4">
+            <?= $lang === 'np' ? 'शीर्ष योगदानकर्ताहरू' : 'Top Contributors' ?>
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="topContributors">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Environmental Impact Details -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-lg font-semibold mb-4">
+          <?= $lang === 'np' ? 'पर्यावरणीय प्रभाव विवरण' : 'Environmental Impact Details' ?>
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div class="p-4 bg-green-50 rounded-lg">
+            <i class="fas fa-tree text-green-600 text-2xl mb-2"></i>
+            <p class="text-sm text-gray-600"><?= $lang === 'np' ? 'कुल प्रभाव' : 'Total Impact' ?></p>
+            <p id="environmentalImpactTotal" class="text-xl font-bold text-green-700">0 kg CO₂</p>
+          </div>
+          <div class="p-4 bg-blue-50 rounded-lg">
+            <i class="fas fa-recycle text-blue-600 text-2xl mb-2"></i>
+            <p class="text-sm text-gray-600"><?= $lang === 'np' ? 'रिसाइकल गरिएको' : 'Recycled' ?></p>
+            <p id="recycledImpact" class="text-xl font-bold text-blue-700">0 kg CO₂</p>
+          </div>
+          <div class="p-4 bg-purple-50 rounded-lg">
+            <i class="fas fa-seedling text-purple-600 text-2xl mb-2"></i>
+            <p class="text-sm text-gray-600"><?= $lang === 'np' ? 'बचत गरिएको' : 'Saved' ?></p>
+            <p id="savedImpact" class="text-xl font-bold text-purple-700">0 kg CO₂</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <script src="https://kit.fontawesome.com/3f471bb5a5.js" crossorigin="anonymous"></script>
-  <script src="/GreenBin/frontend/dashboard/dashboard.js" defer></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async
-    defer></script>
-
-  <!-- Edit Report Modal -->
-  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-    <div class="bg-white p-6 rounded-md w-full max-w-lg shadow-lg relative">
-      <button onclick="closeEditModal()" class="absolute top-2 right-2 text-gray-600 text-xl">&times;</button>
-      <h3 class="text-xl font-bold mb-4"><?= $lang === 'np' ? 'रिपोर्ट सम्पादन गर्नुहोस्' : 'Edit Report' ?></h3>
-      <form id="editReportForm" class="space-y-4" enctype="multipart/form-data">
-        <input type="hidden" name="reportId" id="editReportId" />
-
-        <div>
-          <label for="editTitle" class="block text-sm font-medium mb-1">
-            <?= $lang === 'np' ? 'शीर्षक' : 'Title' ?>
-          </label>
-          <input type="text" id="editTitle" name="title" required
-            class="w-full border border-gray-300 p-2 rounded-md" />
-        </div>
-
-        <div>
-          <label for="editDescription" class="block text-sm font-medium mb-1">
-            <?= $lang === 'np' ? 'विवरण' : 'Description' ?>
-          </label>
-          <textarea id="editDescription" name="description" required rows="4"
-            class="w-full border border-gray-300 p-2 rounded-md"></textarea>
-        </div>
-
-        <div>
-          <label for="editLocation" class="block text-sm font-medium mb-1">
-            <?= $lang === 'np' ? 'स्थान' : 'Location' ?>
-          </label>
-          <input type="text" id="editLocation" name="location" class="w-full border border-gray-300 p-2 rounded-md" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium mb-1">
-            <?= $lang === 'np' ? 'नयाँ फोटो (वैकल्पिक)' : 'New Photo (optional)' ?>
-          </label>
-          <input type="file" name="photo" id="editPhoto" accept="image/*"
-            class="w-full border border-dashed p-2 rounded-md" />
-        </div>
-
-        <div class="text-right">
-          <button type="submit" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md">
-            <?= $lang === 'np' ? 'परिवर्तनहरू सुरक्षित गर्नुहोस्' : 'Save Changes' ?>
-          </button>
-        </div>
-        <p id="editError" class="text-sm text-red-600 mt-2 hidden"></p>
-      </form>
-    </div>
-  </div>
-
-</body>
-
-</html>
+<?php require_once 'includes/user_footer.php'; ?>

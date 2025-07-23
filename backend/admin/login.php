@@ -19,28 +19,22 @@ if (!$email || !$password) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT id, first_name, password_hash, role FROM users WHERE email_id = :email");
+    $stmt = $pdo->prepare("SELECT id, first_name, password_hash, role FROM users WHERE email_id = :email AND role = 'admin'");
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password_hash'])) {
-        if ($user['role'] === 'user') {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['first_name'];
-            $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['first_name'];
+        $_SESSION['user_role'] = $user['role'];
 
-            http_response_code(200);
-            echo json_encode([
-                'message' => 'Login successful.',
-                'user_id' => $user['id'],
-                'user_name' => $user['first_name'],
-                'role' => $user['role']
-            ]);
-        } else {
-            // If the user is not a 'user' (e.g., admin, superadmin), deny login through this endpoint
-            http_response_code(403); // Forbidden
-            echo json_encode(['message' => 'Unauthorized role. Please use the correct login portal.']);
-        }
+        http_response_code(200);
+        echo json_encode([
+            'message' => 'Login successful.',
+            'user_id' => $user['id'],
+            'user_name' => $user['first_name'],
+            'role' => $user['role']
+        ]);
     } else {
         http_response_code(401);
         echo json_encode(['message' => 'Invalid email or password.']);

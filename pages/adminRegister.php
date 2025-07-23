@@ -14,7 +14,7 @@ $lang = $_SESSION['lang'] ?? 'en';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?= $lang === 'np' ? 'दर्ता - हरित नेपाल' : 'Register - हरित नेपाल' ?></title>
+    <title><?= $lang === 'np' ? 'एडमिन दर्ता - हरित नेपाल' : 'Admin Registration - हरित नेपाल' ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/GreenBin/frontend/register/register.css">
@@ -55,7 +55,7 @@ $lang = $_SESSION['lang'] ?? 'en';
 <body class="relative  min-h-screen bg-gray-200 bg-cover bg-center bg-no-repeat">
 
     <div class="flex justify-center items-center w-full min-h-screen px-4 bg-overlay">
-        <form action="/GreenBin/backend/register.php" method="POST"
+        <form action="/GreenBin/backend/admin/register.php" method="POST"
             class="relative z-10 bg-white rounded-lg shadow-lg w-full max-w-screen-md p-6 text-sm">
             <!-- Logo & Title -->
             <div class="flex items-center justify-between mb-4">
@@ -70,10 +70,10 @@ $lang = $_SESSION['lang'] ?? 'en';
             </div>
 
             <h2 class="text-xl font-bold text-center mb-1">
-                <?= $lang === 'np' ? 'हरित नेपालमा सामेल हुनुहोस्' : 'Join GreenBin Nepal' ?>
+                <?= $lang === 'np' ? 'एडमिन खाता बनाउनुहोस्' : 'Create Admin Account' ?>
             </h2>
             <p class="text-center text-gray-600 mb-4 text-xs">
-                <?= $lang === 'np' ? 'तपाईंको समुदायमा फरक ल्याउनको लागि आफ्नो खाता बनाउनुहोस् 🌱' : 'Create your account to start making a difference in your community 🌱' ?>
+                <?= $lang === 'np' ? 'नयाँ एडमिन खाता दर्ता गर्नुहोस्।' : 'Register a new admin account.' ?>
             </p>
 
             <!-- Grid Layout -->
@@ -110,6 +110,24 @@ $lang = $_SESSION['lang'] ?? 'en';
                 </div>
 
                 <div>
+                    <label for="ward" class="block font-medium mb-1 text-xs">Ward</label>
+                    <input name="ward" id="ward" type="text" placeholder="e.g., 5" required
+                        class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
+                </div>
+
+                <div>
+                    <label for="nagarpalika" class="block font-medium mb-1 text-xs">Nagarpalika</label>
+                    <input name="nagarpalika" id="nagarpalika" type="text" placeholder="e.g., Kathmandu" required
+                        class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="address" class="block font-medium mb-1 text-xs">Address</label>
+                    <input name="address" id="address" type="text" placeholder="e.g., New Baneshwor" required
+                        class="w-full p-2 border rounded-md shadow-sm focus:ring-green-600 focus:outline-none text-sm" />
+                </div>
+
+                <div>
                     <label for="password"
                         class="block font-medium mb-1 text-xs"><?= $lang === 'np' ? 'पासवर्ड' : 'Password' ?></label>
                     <input name="password" id="password" type="password" placeholder="********" required
@@ -130,18 +148,11 @@ $lang = $_SESSION['lang'] ?? 'en';
             <div class="mt-4">
                 <button type="submit"
                     class="w-full bg-green-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-300 text-sm">
-                    <?= $lang === 'np' ? 'खाता बनाउनुहोस्' : 'Create Account' ?>
+                    <?= $lang === 'np' ? 'खाता बनाउनुहोस्' : 'Create Admin Account' ?>
                 </button>
             </div>
 
             <!-- Links -->
-            <p class="text-center mt-4 text-xs text-gray-700">
-                <?= $lang === 'np' ? 'पहिले नै खाता छ?' : 'Already have an account?' ?>
-                <a href="/GreenBin/login" class="text-green-600 font-semibold hover:underline">
-                    <?= $lang === 'np' ? 'लग-इन गर्नुहोस्' : 'Sign in Here' ?>
-                </a>
-            </p>
-
             <p class="text-center mt-1 text-xs text-gray-700">
                 <a href="/GreenBin/home" class="text-green-600 font-semibold hover:underline">
                     &#8592; <?= $lang === 'np' ? 'मुख्य पृष्ठमा फर्कनुहोस्' : 'Back to Home' ?>

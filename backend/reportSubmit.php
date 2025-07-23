@@ -10,6 +10,7 @@ header('Content-Type: application/json');
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/db.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/reverseGeocode.php';
 
 if (!isset($_SESSION['user_id'])) {
     ob_end_clean();
@@ -24,6 +25,17 @@ function cleanInput($data) {
 $title = cleanInput($_POST['reportTitle'] ?? '');
 $description = cleanInput($_POST['description'] ?? '');
 $location = cleanInput($_POST['location'] ?? '');
+$latitude = null;
+$longitude = null;
+
+// Check if location is a lat/lon pair
+if (preg_match('/^([-]?\d{1,2}\.\d+),([-]?\d{1,3}\.\d+)$/', $location, $matches)) {
+    $latitude = (float) $matches[1];
+    $longitude = (float) $matches[2];
+    // Convert coordinates to a human-readable address
+    $location = getAddressFromCoordinates($latitude, $longitude);
+}
+
 
 if (empty($title) || empty($description)) {
     ob_end_clean();

@@ -42,8 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.style.color = "green";
         messageDiv.textContent = data.message || "Login successful!";
         setTimeout(() => {
-          if (data.role === "admin") {
-            window.location.href = "/GreenBin/admin";
+          if (data.role === "superAdmin") {
+            // Corrected case to match database
+            window.location.href = "/GreenBin/manageUsers"; // Redirect to superadmin dashboard
+          } else if (data.role === "admin") {
+            window.location.href = "/GreenBin/adminDashboard";
           } else if (data.role === "user") {
             window.location.href = "/GreenBin/dashboard";
           } else {

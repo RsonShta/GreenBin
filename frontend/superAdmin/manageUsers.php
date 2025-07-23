@@ -1,4 +1,12 @@
 <?php
+session_start(); // Ensure session is started
+
+// Generate CSRF token if it doesn't exist
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
 require_once __DIR__ . '/../../backend/includes/auth.php';
 requireRole(['superAdmin']); // Only superAdmin allowed
 
@@ -16,7 +24,11 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="p-6 font-sans bg-gray-50">
-  <h1 class="text-2xl font-bold mb-4">Manage Users</h1>
+  <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Manage Users</h1>
+    <input type="text" id="userSearch" placeholder="Search users..." class="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
 
   <table class="min-w-full bg-white shadow rounded">
     <thead class="bg-gray-100 text-left">
@@ -83,7 +95,7 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
           const res = await fetch('/GreenBin/backend/superAdmin/updateRole.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: userId, new_role: newRole })
+            body: JSON.stringify({ user_id: userId, new_role: newRole, _csrf_token: '<?= htmlspecialchars($csrf_token) ?>' })
           });
 
           const data = await res.json();
@@ -112,7 +124,7 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
           const res = await fetch('/GreenBin/backend/superAdmin/deleteUser.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId })
+            body: JSON.stringify({ user_id: userId, _csrf_token: '<?= htmlspecialchars($csrf_token) ?>' })
           });
 
           const data = await res.json();
@@ -124,6 +136,23 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
           }
         } catch {
           showToast('Network error', true);
+        }
+      });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('userSearch');
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    searchInput.addEventListener('keyup', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+
+      tableRows.forEach(row => {
+        const rowText = row.textContent.toLowerCase();
+        if (rowText.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
         }
       });
     });

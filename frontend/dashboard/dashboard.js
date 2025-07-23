@@ -1,4 +1,42 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // === Tab Navigation ===
+  const reportsTab = document.getElementById("reportsTab");
+  const analyticsTab = document.getElementById("analyticsTab");
+  const reportsSection = document.getElementById("reportsSection");
+  const analyticsSection = document.getElementById("analyticsSection");
+
+  // Tab switching functionality
+  function switchTab(activeTab, activeSection) {
+    // Remove active states from all tabs
+    document.querySelectorAll(".tab-link").forEach((tab) => {
+      tab.classList.remove("border-b-2", "border-green-700", "pb-1");
+      tab.classList.add("hover:underline");
+    });
+
+    // Add active state to clicked tab
+    activeTab.classList.add("border-b-2", "border-green-700", "pb-1");
+    activeTab.classList.remove("hover:underline");
+
+    // Hide all sections
+    reportsSection.classList.add("hidden");
+    analyticsSection.classList.add("hidden");
+
+    // Show active section
+    activeSection.classList.remove("hidden");
+  }
+
+  // Tab event listeners
+  reportsTab.addEventListener("click", (e) => {
+    e.preventDefault();
+    switchTab(reportsTab, reportsSection);
+  });
+
+  analyticsTab.addEventListener("click", (e) => {
+    e.preventDefault();
+    switchTab(analyticsTab, analyticsSection);
+    loadAnalytics(); // Load analytics data when tab is clicked
+  });
+
   // === NEW: Show/Hide Report Submission Form on button clicks ===
   const showFormBtn = document.getElementById("showReportFormBtn");
   const reportFormSection = document.getElementById("reportFormSection");
@@ -261,30 +299,27 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Try to get user's geolocation and append as hidden input.
+   * Try to get user's geolocation and populate the location input field.
    */
   function tryGeolocation() {
+    const locationInput = document.getElementById("location");
     if (!navigator.geolocation) {
       console.warn("Geolocation not supported");
+      showToast("Geolocation is not supported by your browser.");
       return;
     }
+
+    showToast("Getting your location...");
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
-        // Remove any existing location inputs first
-        const existingInput = form.querySelector('input[name="location"]');
-        if (existingInput) existingInput.remove();
-
-        const hiddenInput = document.createElement("input");
-        hiddenInput.type = "hidden";
-        hiddenInput.name = "location";
-        hiddenInput.value = coords;
-        form.appendChild(hiddenInput);
+        locationInput.value = coords;
+        showToast("Location captured successfully.");
       },
       () => {
         console.error("Geolocation unavailable");
-        showToast("Unable to get location. You can enter location manually.");
+        showToast("Unable to get location. Please enter it manually.");
       },
       { timeout: 10000 }
     );
@@ -422,8 +457,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Initial load and geolocation attempt
-  tryGeolocation();
+  // Add event listener for the new "Get Location" button
+  const getLocationBtn = document.getElementById("getLocationBtn");
+  if (getLocationBtn) {
+    getLocationBtn.addEventListener("click", tryGeolocation);
+  }
+
+  // Initial load
   loadUserReports();
   loadDashboardStats();
 
@@ -431,5 +471,262 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     loadUserReports();
     loadDashboardStats();
-  }, 5000);
+  }, 1000);
+
+  // === ANALYTICS FUNCTIONS ===
+  let charts = {}; // To hold chart instances
+
+  // Function to destroy existing charts before creating new ones
+  function destroyCharts() {
+    Object.values(charts).forEach((chart) => chart.destroy());
+    charts = {};
+  }
+
+  // Main function to load and display analytics data
+  async function loadAnalytics() {
+    try {
+      const response = await fetch("/GreenBin/analytics");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      if (data.success) {
+        destroyCharts(); // Clear previous charts
+        const analytics = data.analytics;
+
+        // Update UI elements
+        updatePerformanceMetrics(analytics.performance);
+        updateResponseTime(analytics.responseTime);
+        updateEnvironmentalImpact(analytics.environmentalImpact);
+
+        // Create charts
+        createStatusDistributionChart(analytics.statusDistribution);
+        createMonthlyTrendChart(analytics.monthlyTrend);
+        createWeeklyActivityChart(analytics.weeklyActivity);
+
+        // Handle admin-specific data
+        if (analytics.isAdmin) {
+          document.getElementById("adminAnalytics").classList.remove("hidden");
+          updateTopLocations(analytics.topLocations);
+          updateTopContributors(analytics.userActivity);
+        } else {
+          document.getElementById("adminAnalytics").classList.add("hidden");
+        }
+      } else {
+        console.error("Failed to load analytics:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
+    }
+  }
+
+  // Update performance metrics cards
+  function updatePerformanceMetrics(performance) {
+    const currentMonthReports = performance.current_month_reports || 0;
+    const lastMonthReports = performance.last_month_reports || 0;
+
+    document.getElementById("currentMonthReports").textContent =
+      currentMonthReports;
+
+    const change = currentMonthReports - lastMonthReports;
+    const percentageChange =
+      lastMonthReports > 0
+        ? ((change / lastMonthReports) * 100).toFixed(1)
+        : currentMonthReports > 0
+        ? 100
+        : 0;
+
+    const monthlyChangeEl = document.getElementById("monthlyChange");
+    if (change >= 0) {
+      monthlyChangeEl.innerHTML = `<i class="fas fa-arrow-up text-green-500"></i> ${percentageChange}%`;
+      monthlyChangeEl.title = `vs. last month (${lastMonthReports})`;
+    } else {
+      monthlyChangeEl.innerHTML = `<i class="fas fa-arrow-down text-red-500"></i> ${Math.abs(
+        percentageChange
+      )}%`;
+      monthlyChangeEl.title = `vs. last month (${lastMonthReports})`;
+    }
+  }
+
+  // Update average response time card
+  function updateResponseTime(responseTime) {
+    const avgDays = responseTime.avg_response_days;
+    document.getElementById("avgResponseTime").textContent = avgDays
+      ? `${parseFloat(avgDays).toFixed(1)} days`
+      : "N/A";
+  }
+
+  // Update environmental impact cards
+  function updateEnvironmentalImpact(impact) {
+    const totalCo2 = impact.total_co2 || 0;
+    document.getElementById("totalCo2Impact").textContent = `${parseFloat(
+      totalCo2
+    ).toFixed(1)} kg`;
+    document.getElementById(
+      "environmentalImpactTotal"
+    ).textContent = `${parseFloat(totalCo2).toFixed(1)} kg CO₂`;
+    // Dummy data for recycled/saved for now
+    document.getElementById("recycledImpact").textContent = `${(
+      parseFloat(totalCo2) * 0.6
+    ).toFixed(1)} kg CO₂`;
+    document.getElementById("savedImpact").textContent = `${(
+      parseFloat(totalCo2) * 0.4
+    ).toFixed(1)} kg CO₂`;
+  }
+
+  // Create status distribution pie chart
+  function createStatusDistributionChart(statusData) {
+    const ctx = document.getElementById("statusChart").getContext("2d");
+    const labels = statusData.map((d) => d.status);
+    const data = statusData.map((d) => d.count);
+
+    charts.statusChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            data: data,
+            backgroundColor: ["#f59e0b", "#3b82f6", "#16a34a"],
+            borderColor: "#ffffff",
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+      },
+    });
+  }
+
+  // Create monthly trend line chart
+  function createMonthlyTrendChart(monthlyData) {
+    const ctx = document.getElementById("monthlyChart").getContext("2d");
+    const labels = monthlyData.map((d) => d.month);
+    const totalData = monthlyData.map((d) => d.count);
+    const resolvedData = monthlyData.map((d) => d.resolved_count);
+
+    charts.monthlyChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Total Reports",
+            data: totalData,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: true,
+            tension: 0.3,
+          },
+          {
+            label: "Resolved Reports",
+            data: resolvedData,
+            borderColor: "#16a34a",
+            backgroundColor: "rgba(22, 163, 74, 0.1)",
+            fill: true,
+            tension: 0.3,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Create weekly activity bar chart
+  function createWeeklyActivityChart(weeklyData) {
+    const ctx = document.getElementById("weeklyChart").getContext("2d");
+    const labels = weeklyData.map((d) => `W${d.week_num} ${d.year}`).reverse();
+    const totalData = weeklyData.map((d) => d.count).reverse();
+    const resolvedData = weeklyData.map((d) => d.resolved_count).reverse();
+
+    charts.weeklyChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Total Reports",
+            data: totalData,
+            backgroundColor: "#60a5fa",
+          },
+          {
+            label: "Resolved Reports",
+            data: resolvedData,
+            backgroundColor: "#4ade80",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Update top locations table (admin)
+  function updateTopLocations(locations) {
+    const tableBody = document.getElementById("topLocationsTable");
+    tableBody.innerHTML = "";
+    locations.forEach((loc) => {
+      const rate =
+        loc.report_count > 0
+          ? ((loc.resolved_count / loc.report_count) * 100).toFixed(1)
+          : 0;
+      const row = `
+        <tr class="border-b">
+          <td class="py-2">${escapeHtml(loc.location)}</td>
+          <td>${loc.report_count}</td>
+          <td>${loc.resolved_count}</td>
+          <td>${rate}%</td>
+        </tr>
+      `;
+      tableBody.innerHTML += row;
+    });
+  }
+
+  // Update top contributors section (admin)
+  function updateTopContributors(users) {
+    const container = document.getElementById("topContributors");
+    container.innerHTML = "";
+    users.forEach((user) => {
+      const card = `
+        <div class="bg-gray-50 p-4 rounded-lg border">
+          <p class="font-bold text-green-700">${escapeHtml(user.user_name)}</p>
+          <p class="text-sm">Reports: <strong>${user.total_reports}</strong></p>
+          <p class="text-sm">Resolved: <strong>${
+            user.resolved_reports
+          }</strong></p>
+          <p class="text-sm">CO₂ Impact: <strong>${parseFloat(
+            user.co2_contribution || 0
+          ).toFixed(1)} kg</strong></p>
+        </div>
+      `;
+      container.innerHTML += card;
+    });
+  }
 });

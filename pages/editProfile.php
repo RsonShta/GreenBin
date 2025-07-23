@@ -1,19 +1,9 @@
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
-requireRole(['superAdmin', 'admin', 'user']);
-require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/db.php';
+require_once 'includes/user_header.php';
 
-// Language handling
-if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'np'])) {
-    $_SESSION['lang'] = $_GET['lang'];
-}
-$lang = $_SESSION['lang'] ?? 'en';
-
-$userId = $_SESSION['user_id'];
-
-// Fetch current user details
+// Fetch current user details for the form
 $stmt = $pdo->prepare("SELECT first_name, last_name, email_id, phone_number, profile_photo FROM users WHERE id = ?");
-$stmt->execute([$userId]);
+$stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
@@ -55,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$error) {
             $update = $pdo->prepare("UPDATE users SET first_name=?, last_name=?, phone_number=?, profile_photo=? WHERE id=?");
-            $update->execute([$first_name, $last_name, $phone_number, $profile_photo, $userId]);
+            $update->execute([$first_name, $last_name, $phone_number, $profile_photo, $_SESSION['user_id']]);
 
             $_SESSION['user_name'] = $first_name . " " . $last_name; // update session name
 
@@ -70,43 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="<?= $lang ?>">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?= $lang === 'np' ? 'प्रोफाइल सम्पादन' : 'Edit Profile' ?> - हरित नेपाल</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
-
-<body class="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen">
-
-    <header class="bg-white shadow-sm border-b border-gray-200 py-4 px-6 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <img src="/GreenBin/frontend/img/mountain.png" alt="Logo" class="w-8 h-8" />
-            <div>
-                <h1 class="text-lg font-bold text-green-700">हरित नेपाल</h1>
-                <span class="text-xs text-gray-500">GreenBin Nepal</span>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-4 text-sm">
-            <a href="?lang=<?= $lang === 'en' ? 'np' : 'en' ?>"
-                class="border px-3 py-1 rounded-md text-gray-700 hover:bg-gray-100 transition">
-                🌐 <?= $lang === 'en' ? 'नेपाली' : 'English' ?>
-            </a>
-
-        </div>
-    </header>
 
     <main class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-2 mb-10">
         <a href="/GreenBin/dashboard"
@@ -184,26 +137,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </main>
 
-    <script>
-        // Live preview of profile photo before upload
-        document.getElementById('profile_photo').addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (!file.type.startsWith('image/')) {
-                alert('Please select a valid image file.');
-                event.target.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById('preview').src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-    </script>
-
-</body>
-
-</html>
+<?php require_once 'includes/user_footer.php'; ?>

@@ -6,6 +6,16 @@ require_once __DIR__ . '/../includes/db.php';
 
 header('Content-Type: application/json');
 
+// CSRF Protection
+if (!isset($_SESSION['csrf_token']) || !isset($data['_csrf_token']) || $_SESSION['csrf_token'] !== $data['_csrf_token']) {
+    http_response_code(403);
+    echo json_encode(['message' => 'Invalid CSRF token.']);
+    exit();
+}
+
+// Remove CSRF token from data
+unset($data['_csrf_token']);
+
 $data = json_decode(file_get_contents('php://input'), true);
 $userId = $data['user_id'] ?? null;
 

@@ -1,16 +1,27 @@
 RewriteEngine On
 RewriteBase /GreenBin/
 
-# Prevent rewriting existing files or directories
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
 RewriteRule ^login/?$ pages/login.php [L,QSA]
 RewriteRule ^register/?$ pages/register.php [L,QSA]
 RewriteRule ^dashboard/?$ pages/dashboard.php [L,QSA]
-RewriteRule ^admin/?$ pages/adminDashboard.php [L,QSA]
+RewriteRule ^adminDashboard/?$ pages/adminDashboard.php [L,QSA]
 RewriteRule ^home/?$ pages/home.php [L,QSA]
 RewriteRule ^superadmin/?$ pages/superadmin.php [L,QSA]
 RewriteRule ^lang/?$ pages/lang.php [L,QSA]
 RewriteRule ^profile/?$ pages/profile.php [L,QSA]
 RewriteRule ^editProfile/?$ pages/editProfile.php [L,QSA]
+RewriteRule ^adminRegister/?$ pages/adminRegister.php [L,QSA]
+RewriteRule ^adminLogin/?$ pages/adminLogin.php [L,QSA]
+RewriteRule ^adminProfile/?$ pages/adminProfile.php [L,QSA]
+RewriteRule ^superAdminLogin/?$ pages/superAdminLogin.php [L,QSA]
+RewriteRule ^superAdminProfile/?$ pages/superAdminProfile.php [L,QSA]
+RewriteRule ^analytics/?$ backend/getAnalytics.php [L,QSA]
+RewriteRule ^manageUsers/?$ frontend/superAdmin/manageUsers.php [L,QSA]
+
+# Handle requests for existing files or directories (e.g., CSS, JS, images)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirect to 404 for unmatched routes that are not existing files/directories
+RewriteRule ^(.*)$ pages/404.php [L,QSA]

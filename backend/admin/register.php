@@ -1,8 +1,7 @@
 <?php
-require __DIR__ . '/includes/db.php';
-
-header('Content-Type: application/json');
+require __DIR__ . '/../includes/db.php'; // Adjust path to db.php
 session_start();
+header('Content-Type: application/json');
 
 // Sanitize helper
 function sanitize($input): string
@@ -17,11 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
     $phone = sanitize($_POST['phone_number'] ?? '');
+    $ward = sanitize($_POST['ward'] ?? '');
+    $nagarpalika = sanitize($_POST['nagarpalika'] ?? '');
+    $address = sanitize($_POST['address'] ?? '');
 
-    // ✅ Basic validation
-    if (!$firstName || !$lastName || !$email || !$password || !$confirmPassword || !$phone) {
+    // Basic validation for admin fields
+    if (!$firstName || !$lastName || !$email || !$password || !$confirmPassword || !$phone || !$ward || !$nagarpalika || !$address) {
         http_response_code(400);
-        echo json_encode(['message' => 'Missing required fields.']);
+        echo json_encode(['message' => 'Missing required fields for admin registration.']);
         exit;
     }
 
@@ -50,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // ✅ Check if email or phone already exists
+        // Check if email or phone already exists
         $checkStmt = $pdo->prepare("SELECT email_id, phone_number FROM users WHERE email_id = :email OR phone_number = :phone");
         $checkStmt->execute([':email' => $email, ':phone' => $phone]);
         $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
@@ -68,8 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // ✅ All good — insert new user
+        // Insert new user with 'admin' role
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+
+        $pdo->beginTransaction();
 
         $stmt = $pdo->prepare("
             INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country, role, profile_photo)
@@ -83,20 +87,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':password_hash' => $passwordHash,
             ':phone' => $phone,
             ':country' => 'NP',
-            ':role' => 'user',
+            ':role' => 'admin', // Set role to admin
             ':profile_photo' => 'default.jpg'
         ]);
 
         $userId = $pdo->lastInsertId();
 
+        // Insert admin-specific details
+        $adminStmt = $pdo->prepare("
+            INSERT INTO admin_details (user_id, ward, nagarpalika, address)
+            VALUES (:user_id, :ward, :nagarpalika, :address)
+        ");
+        $adminStmt->execute([
+            ':user_id' => $userId,
+            ':ward' => $ward,
+            ':nagarpalika' => $nagarpalika,
+            ':address' => $address
+        ]);
+
+        $pdo->commit();
+
         http_response_code(201);
         echo json_encode([
-            'message' => 'Registration successful.',
+            'message' => 'Admin registration successful.',
             'user_id' => $userId,
-            'role' => 'user'
+            'role' => 'admin'
         ]);
     } catch (PDOException $e) {
-        error_log("Registration Error: " . $e->getMessage());
+        $pdo->rollBack();
+        error_log("Admin Registration Error: " . $e->getMessage());
         http_response_code(500);
         echo json_encode(['message' => 'Internal Server Error.']);
     }
