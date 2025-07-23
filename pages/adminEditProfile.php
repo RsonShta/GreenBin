@@ -1,15 +1,21 @@
 <?php
-require_once 'includes/user_header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/db.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
 
-// Allow both admin and user to access this page, but logic will differ
-requireRole(['admin', 'user'], '/GreenBin/login');
+// Require admin role
+requireRole(['admin'], '/GreenBin/login');
+
+// Language Switch
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'np'])) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+$lang = $_SESSION['lang'] ?? 'en';
 
 // Fetch current user details for the form
 $userId = $_SESSION['user_id'];
 $stmt = $pdo->prepare("
     SELECT u.first_name, u.last_name, u.email_id, u.phone_number, u.profile_photo, u.role,
-           ad.ward, ad.nagarpalika, ad.address
+           ad.ward, ad.nagarpalika, ad.address, ad.office_phone, ad.department, ad.employee_id
     FROM users u
     LEFT JOIN admin_details ad ON u.id = ad.user_id
     WHERE u.id = ?
@@ -45,8 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fileName = time() . "_" . basename($_FILES["profile_photo"]["name"]);
             $targetFile = $targetDir . $fileName;
 
-            // Optional: Validate file type and size here if you want
-
             if (move_uploaded_file($_FILES["profile_photo"]["tmp_name"], $targetFile)) {
                 $profile_photo = $fileName;
             } else {
@@ -60,26 +64,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $update = $pdo->prepare("UPDATE users SET first_name=?, last_name=?, phone_number=?, profile_photo=? WHERE id=?");
                 $update->execute([$first_name, $last_name, $phone_number, $profile_photo, $_SESSION['user_id']]);
 
-                if ($user['role'] === 'admin') {
-                    $ward = trim($_POST['ward']);
-                    $nagarpalika = trim($_POST['nagarpalika']);
-                    $address = trim($_POST['address']);
+                $ward = trim($_POST['ward']);
+                $nagarpalika = trim($_POST['nagarpalika']);
+                $address = trim($_POST['address']);
+                $office_phone = trim($_POST['office_phone']);
+                $department = trim($_POST['department']);
+                $employee_id = trim($_POST['employee_id']);
 
-                    $adminUpdate = $pdo->prepare("
-                        INSERT INTO admin_details (user_id, ward, nagarpalika, address)
-                        VALUES (?, ?, ?, ?)
-                        ON DUPLICATE KEY UPDATE ward = VALUES(ward), nagarpalika = VALUES(nagarpalika), address = VALUES(address)
-                    ");
-                    $adminUpdate->execute([$userId, $ward, $nagarpalika, $address]);
-                }
-
+                $adminUpdate = $pdo->prepare("
+                    INSERT INTO admin_details (user_id, ward, nagarpalika, address, office_phone, department, employee_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE ward = VALUES(ward), nagarpalika = VALUES(nagarpalika), address = VALUES(address), office_phone = VALUES(office_phone), department = VALUES(department), employee_id = VALUES(employee_id)
+                ");
+                $adminUpdate->execute([$userId, $ward, $nagarpalika, $address, $office_phone, $department, $employee_id]);
+                
                 $pdo->commit();
 
                 $_SESSION['user_name'] = $first_name . " " . $last_name; // update session name
                 $success = $lang === 'np' ? "प्रोफाइल सफलतापूर्वक अपडेट भयो!" : "Profile updated successfully!";
             } catch (Exception $e) {
                 $pdo->rollBack();
-                $error = "An error occurred.";
+                $error = "An error occurred: " . $e->getMessage();
             }
 
             // Refresh user data
@@ -87,24 +92,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user['last_name'] = $last_name;
             $user['phone_number'] = $phone_number;
             $user['profile_photo'] = $profile_photo;
+            $user['ward'] = $ward;
+            $user['nagarpalika'] = $nagarpalika;
+            $user['address'] = $address;
+            $user['office_phone'] = $office_phone;
+            $user['department'] = $department;
+            $user['employee_id'] = $employee_id;
         }
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="<?= $lang ?>">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= $lang === 'np' ? 'एडमिन प्रोफाइल सम्पादन गर्नुहोस्' : 'Edit Admin Profile' ?> - GreenBin Nepal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { inter: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: '#2e7d32',
+                        dark: '#1b5e20',
+                        light: '#f0fdf4'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html,
+        body {
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen font-inter">
+
+    <header class="bg-white shadow-sm border-b border-gray-200 py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <img src="/GreenBin/frontend/img/mountain.png" class="w-8 h-8" alt="Logo" />
+            <div>
+                <h1 class="text-lg font-bold text-green-700 leading-tight">हरित नेपाल</h1>
+                <span class="text-xs text-gray-500">GreenBin Nepal</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+            <a href="?lang=<?= $lang === 'en' ? 'np' : 'en' ?>"
+                class="text-xs px-2 py-1 border rounded hover:bg-gray-100 transition">
+                <?= $lang === 'en' ? 'नेपाली' : 'English' ?>
+            </a>
+            <a href="/GreenBin/adminProfile" class="text-gray-700 hover:text-green-700 transition">
+                <?= $lang === 'np' ? 'प्रोफाइल' : 'Profile' ?>
+            </a>
+            <a href="/GreenBin/backend/logout.php"
+                class="border px-3 py-1 rounded-md text-gray-800 hover:bg-gray-100 flex items-center gap-1 text-sm transition">
+                <?= $lang === 'np' ? 'लग आउट' : 'Logout' ?>
+            </a>
+        </div>
+    </header>
 
     <main class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-2 mb-10">
-        <?php
-        $dashboardLink = '/GreenBin/dashboard';
-        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
-            $dashboardLink = '/GreenBin/adminDashboard';
-        }
-        ?>
-        <a href="<?= $dashboardLink ?>"
+        <a href="/GreenBin/adminProfile"
             class="inline-block text-green-700 hover:text-white hover:bg-green-700 transition text-xs border border-green-700 rounded px-1.5 py-0.5 mb-4">
-            <?= $lang === 'np' ? 'ड्यासबोर्डमा फर्कनुहोस्' : '<-- Back to Dashboard' ?>
+            <?= $lang === 'np' ? 'प्रोफाइलमा फर्कनुहोस्' : '<-- Back to Profile' ?>
         </a>
         <h2 class="text-xl font-bold mt-2 mb-6">
-            <?= $lang === 'np' ? 'प्रोफाइल सम्पादन गर्नुहोस्' : 'Edit Your Profile' ?>
+            <?= $lang === 'np' ? 'एडमिन प्रोफाइल सम्पादन गर्नुहोस्' : 'Edit Admin Profile' ?>
         </h2>
 
         <?php if ($error): ?>
@@ -154,20 +221,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <!-- Admin Fields -->
-            <?php if ($user['role'] === 'admin'): ?>
-                <div>
-                    <label for="ward" class="block text-sm font-medium mb-1">Ward</label>
-                    <input type="text" id="ward" name="ward" value="<?= htmlspecialchars($user['ward'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md">
-                </div>
-                <div>
-                    <label for="nagarpalika" class="block text-sm font-medium mb-1">Nagarpalika</label>
-                    <input type="text" id="nagarpalika" name="nagarpalika" value="<?= htmlspecialchars($user['nagarpalika'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md">
-                </div>
-                <div>
-                    <label for="address" class="block text-sm font-medium mb-1">Address</label>
-                    <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md">
-                </div>
-            <?php endif; ?>
+            <div>
+                <label for="ward" class="block text-sm font-medium mb-1">Ward</label>
+                <input type="text" id="ward" name="ward" value="<?= htmlspecialchars($user['ward'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+            </div>
+            <div>
+                <label for="nagarpalika" class="block text-sm font-medium mb-1">Nagarpalika</label>
+                <input type="text" id="nagarpalika" name="nagarpalika" value="<?= htmlspecialchars($user['nagarpalika'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+            </div>
+            <div>
+                <label for="address" class="block text-sm font-medium mb-1">Address</label>
+                <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+            </div>
+            <div>
+                <label for="office_phone" class="block text-sm font-medium mb-1">Office Phone</label>
+                <input type="text" id="office_phone" name="office_phone" value="<?= htmlspecialchars($user['office_phone'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+            </div>
+            <div>
+                <label for="department" class="block text-sm font-medium mb-1">Department</label>
+                <input type="text" id="department" name="department" value="<?= htmlspecialchars($user['department'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+            </div>
+            <div>
+                <label for="employee_id" class="block text-sm font-medium mb-1">Employee ID</label>
+                <input type="text" id="employee_id" name="employee_id" value="<?= htmlspecialchars($user['employee_id'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+            </div>
 
             <!-- Profile Photo -->
             <div>
@@ -190,4 +267,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </main>
 
-<?php require_once 'includes/user_footer.php'; ?>
+</body>
+</html>

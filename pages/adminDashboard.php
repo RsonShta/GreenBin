@@ -63,7 +63,7 @@ $lang = $_SESSION['lang'] ?? 'en';
                 class="text-xs px-2 py-1 border rounded hover:bg-gray-100 transition">
                 <?= $lang === 'en' ? 'नेपाली' : 'English' ?>
             </a>
-            <a href="/GreenBin/profile" class="text-gray-700 hover:text-green-700 transition">
+            <a href="/GreenBin/adminProfile" class="text-gray-700 hover:text-green-700 transition">
                 <?= $lang === 'np' ? 'प्रोफाइल' : 'Profile' ?>
             </a>
             <a href="/GreenBin/backend/logout.php"
