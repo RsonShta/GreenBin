@@ -114,20 +114,8 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
             class="w-full border border-gray-300 p-2 rounded-md focus:ring focus:ring-green-200 focus:outline-none h-32"></textarea>
         </div>
 
-        <div>
-          <label for="location" class="block text-sm font-medium mb-1">
-            <?= $lang === 'np' ? 'स्थान' : 'Location' ?>
-          </label>
-          <div class="flex items-center gap-2">
-            <input id="location" name="location" type="text"
-              placeholder="<?= $lang === 'np' ? 'स्थान प्रविष्ट गर्नुहोस् वा पत्ता लगाउनुहोस्' : 'Enter location or get automatically' ?>"
-              class="w-full border border-gray-300 p-2 rounded-md focus:ring focus:ring-green-200 focus:outline-none" />
-            <button type="button" id="getLocationBtn"
-              class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
-              <i class="fas fa-map-marker-alt"></i>
-            </button>
-          </div>
-        </div>
+        <input type="hidden" id="location" name="location" />
+        <div id="location-permission-message" class="text-sm text-gray-600"></div>
 
         <div>
           <label class="block text-sm font-medium mb-1">
@@ -331,4 +319,30 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
 
   </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const locationPermissionMessage = document.getElementById('location-permission-message');
+    const locationInput = document.getElementById('location');
+
+    if (navigator.geolocation) {
+        locationPermissionMessage.textContent = '<?= $lang === 'np' ? 'तपाईंको स्थान स्वचालित रूपमा पत्ता लगाउन अनुमति दिनुहोस्। तपाईं पछि यसलाई परिवर्तन गर्न सक्नुहुन्छ।' : 'Please allow location access to automatically detect your location. You can change it later.' ?>';
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                const coords = `${latitude},${longitude}`;
+                locationInput.value = coords;
+                sessionStorage.setItem('user_location', coords);
+                locationPermissionMessage.textContent = '<?= $lang === 'np' ? 'स्थान सफलतापूर्वक पत्ता लाग्यो।' : 'Location successfully detected.' ?>';
+            },
+            (error) => {
+                locationPermissionMessage.textContent = '<?= $lang === 'np' ? 'स्थान पहुँच अस्वीकार गरियो। कृपया म्यानुअल रूपमा स्थान प्रविष्ट गर्नुहोस्।' : 'Location access denied. Please enter location manually.' ?>';
+                console.error('Geolocation error:', error);
+            }
+        );
+    } else {
+        locationPermissionMessage.textContent = '<?= $lang === 'np' ? 'तपाईंको ब्राउजरले जियोलोकेशन समर्थन गर्दैन।' : 'Your browser does not support geolocation.' ?>';
+    }
+});
+</script>
 <?php require_once 'includes/user_footer.php'; ?>

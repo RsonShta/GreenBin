@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const emailError = document.getElementById("email_error");
   const passwordError = document.getElementById("password_error");
   const messageDiv = document.getElementById("message");
+  const submitButton = form.querySelector("button[type='submit']");
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -29,6 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!valid) return;
 
     const formData = new FormData(form);
+    formData.set("email", emailInput.value.trim().toLowerCase());
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Logging in...";
 
     try {
       const response = await fetch(form.action, {
@@ -36,15 +41,23 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData,
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        if (response.headers.get("content-type")?.includes("application/json")) {
+          data = await response.json();
+        }
+      } catch {
+        messageDiv.style.color = "red";
+        messageDiv.textContent = "Unexpected server response.";
+        return;
+      }
 
       if (response.ok) {
         messageDiv.style.color = "green";
         messageDiv.textContent = data.message || "Login successful!";
         setTimeout(() => {
           if (data.role === "superAdmin") {
-            // Corrected case to match database
-            window.location.href = "/GreenBin/manageUsers"; // Redirect to superadmin dashboard
+            window.location.href = "/GreenBin/manageUsers";
           } else if (data.role === "admin") {
             window.location.href = "/GreenBin/adminDashboard";
           } else if (data.role === "user") {
@@ -60,6 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       messageDiv.style.color = "red";
       messageDiv.textContent = "Network error: " + err.message;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Login";
     }
   });
 });

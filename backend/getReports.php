@@ -1,19 +1,18 @@
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
-requireRole(['superAdmin', 'admin', 'user']);
-require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/db.php';
 
+require_once __DIR__ . '/classes/Report.php';
+
+session_start();
 header('Content-Type: application/json');
 
-$user_id = $_SESSION['user_id'];
-
-try {
-    $stmt = $pdo->prepare("SELECT report_id, title, description, image_path, location, status, date FROM reports WHERE user_id = :user_id ORDER BY date DESC");
-    $stmt->execute([':user_id' => $user_id]);
-    $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    echo json_encode(['success' => true, 'reports' => $reports]);
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Failed to fetch reports']);
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['message' => 'Method Not Allowed']);
+    exit;
 }
+
+$report = new Report();
+$result = $report->getAllReports();
+
+http_response_code($result['code']);
+echo json_encode($result);

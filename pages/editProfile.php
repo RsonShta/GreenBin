@@ -2,8 +2,15 @@
 require_once 'includes/user_header.php';
 
 // Fetch current user details for the form
-$stmt = $pdo->prepare("SELECT first_name, last_name, email_id, phone_number, profile_photo FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
+$userId = $_SESSION['user_id'];
+$stmt = $pdo->prepare("
+    SELECT u.first_name, u.last_name, u.email_id, u.phone_number, u.profile_photo, u.role,
+           ad.ward, ad.nagarpalika, ad.address
+    FROM users u
+    LEFT JOIN admin_details ad ON u.id = ad.user_id
+    WHERE u.id = ?
+");
+$stmt->execute([$userId]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
@@ -44,12 +51,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (!$error) {
-            $update = $pdo->prepare("UPDATE users SET first_name=?, last_name=?, phone_number=?, profile_photo=? WHERE id=?");
-            $update->execute([$first_name, $last_name, $phone_number, $profile_photo, $_SESSION['user_id']]);
+            $pdo->beginTransaction();
+            try {
+                $update = $pdo->prepare("UPDATE users SET first_name=?, last_name=?, phone_number=?, profile_photo=? WHERE id=?");
+                $update->execute([$first_name, $last_name, $phone_number, $profile_photo, $_SESSION['user_id']]);
 
-            $_SESSION['user_name'] = $first_name . " " . $last_name; // update session name
+                if ($user['role'] === 'admin') {
+                    $ward = trim($_POST['ward']);
+                    $nagarpalika = trim($_POST['nagarpalika']);
+                    $address = trim($_POST['address']);
 
-            $success = $lang === 'np' ? "प्रोफाइल सफलतापूर्वक अपडेट भयो!" : "Profile updated successfully!";
+                    $adminUpdate = $pdo->prepare("
+                        INSERT INTO admin_details (user_id, ward, nagarpalika, address)
+                        VALUES (?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE ward = VALUES(ward), nagarpalika = VALUES(nagarpalika), address = VALUES(address)
+                    ");
+                    $adminUpdate->execute([$userId, $ward, $nagarpalika, $address]);
+                }
+
+                $pdo->commit();
+
+                $_SESSION['user_name'] = $first_name . " " . $last_name; // update session name
+                $success = $lang === 'np' ? "प्रोफाइल सफलतापूर्वक अपडेट भयो!" : "Profile updated successfully!";
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                $error = "An error occurred.";
+            }
 
             // Refresh user data
             $user['first_name'] = $first_name;
@@ -62,7 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
     <main class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-2 mb-10">
-        <a href="/GreenBin/dashboard"
+        <?php
+        $dashboardLink = '/GreenBin/dashboard';
+        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+            $dashboardLink = '/GreenBin/adminDashboard';
+        }
+        ?>
+        <a href="<?= $dashboardLink ?>"
             class="inline-block text-green-700 hover:text-white hover:bg-green-700 transition text-xs border border-green-700 rounded px-1.5 py-0.5 mb-4">
             <?= $lang === 'np' ? 'ड्यासबोर्डमा फर्कनुहोस्' : '<-- Back to Dashboard' ?>
         </a>
@@ -115,6 +148,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     value="<?= htmlspecialchars($user['phone_number']) ?>"
                     class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
             </div>
+
+            <!-- Admin Fields -->
+            <?php if ($user['role'] === 'admin'): ?>
+                <div>
+                    <label for="ward" class="block text-sm font-medium mb-1">Ward</label>
+                    <input type="text" id="ward" name="ward" value="<?= htmlspecialchars($user['ward'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md">
+                </div>
+                <div>
+                    <label for="nagarpalika" class="block text-sm font-medium mb-1">Nagarpalika</label>
+                    <input type="text" id="nagarpalika" name="nagarpalika" value="<?= htmlspecialchars($user['nagarpalika'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md">
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium mb-1">Address</label>
+                    <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md">
+                </div>
+            <?php endif; ?>
 
             <!-- Profile Photo -->
             <div>

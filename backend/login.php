@@ -1,5 +1,7 @@
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/db.php';
+
+require_once __DIR__ . '/classes/User.php';
+
 session_start();
 header('Content-Type: application/json');
 
@@ -9,44 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
-$password = $_POST['password'] ?? '';
+$user = new User();
+$result = $user->login($_POST);
 
-if (!$email || !$password) {
-    http_response_code(400);
-    echo json_encode(['message' => 'Missing email or password.']);
-    exit;
-}
-
-try {
-    $stmt = $pdo->prepare("SELECT id, first_name, password_hash, role FROM users WHERE email_id = :email");
-    $stmt->execute([':email' => $email]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($password, $user['password_hash'])) {
-        if ($user['role'] === 'user') {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['first_name'];
-            $_SESSION['user_role'] = $user['role'];
-
-            http_response_code(200);
-            echo json_encode([
-                'message' => 'Login successful.',
-                'user_id' => $user['id'],
-                'user_name' => $user['first_name'],
-                'role' => $user['role']
-            ]);
-        } else {
-            // If the user is not a 'user' (e.g., admin, superadmin), deny login through this endpoint
-            http_response_code(403); // Forbidden
-            echo json_encode(['message' => 'Unauthorized role. Please use the correct login portal.']);
-        }
-    } else {
-        http_response_code(401);
-        echo json_encode(['message' => 'Invalid email or password.']);
-    }
-} catch (PDOException $e) {
-    error_log("Login error: " . $e->getMessage());
-    http_response_code(500);
-    echo json_encode(['message' => 'Internal Server Error.']);
-}
+http_response_code($result['code']);
+echo json_encode($result);

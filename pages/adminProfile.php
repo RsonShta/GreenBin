@@ -71,7 +71,7 @@ if (!$user) {
 
 
     <div class="mt-6 flex justify-between">
-        <a href="/GreenBin/admin" class="text-sm bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+<a href="/GreenBin/adminDashboard" class="text-sm bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
             &#8592; Back to Admin Dashboard
         </a>
         <a href="/GreenBin/editProfile" class="text-sm bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">

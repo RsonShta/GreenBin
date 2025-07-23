@@ -7,10 +7,10 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 $csrf_token = $_SESSION['csrf_token'];
 
-require_once __DIR__ . '/../../backend/includes/auth.php';
+require_once __DIR__ . '/../backend/includes/auth.php';
 requireRole(['superAdmin']); // Only superAdmin allowed
 
-require_once __DIR__ . '/../../backend/includes/db.php';
+require_once __DIR__ . '/../backend/includes/db.php';
 
 // Fetch all users except superAdmin
 $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM users WHERE role != 'superAdmin'")->fetchAll(PDO::FETCH_ASSOC);
@@ -27,7 +27,10 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
   <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-2xl font-bold">Manage Users</h1>
-    <input type="text" id="userSearch" placeholder="Search users..." class="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div>
+      <input type="text" id="userSearch" placeholder="Search users..." class="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <button id="add-user-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 ml-2">Add Admin</button>
+    </div>
   </div>
 
   <table class="min-w-full bg-white shadow rounded">
@@ -59,6 +62,35 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
       <?php endforeach; ?>
     </tbody>
   </table>
+
+  <!-- Add User Modal -->
+  <div id="add-user-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3 text-center">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Add New Admin</h3>
+        <div class="mt-2 px-7 py-3">
+          <form id="add-user-form">
+            <input type="text" name="first_name" placeholder="First Name" class="w-full p-2 border rounded mb-2" required>
+            <input type="email" name="email" placeholder="Email" class="w-full p-2 border rounded mb-2" required>
+            <input type="text" name="phone_number" placeholder="Phone Number" class="w-full p-2 border rounded mb-2" required>
+            <input type="password" name="password" placeholder="Password" class="w-full p-2 border rounded mb-2" required>
+            <input type="text" name="ward" placeholder="Ward" class="w-full p-2 border rounded mb-2" required>
+            <input type="text" name="nagarpalika" placeholder="Nagarpalika" class="w-full p-2 border rounded mb-2" required>
+            <input type="text" name="address" placeholder="Address" class="w-full p-2 border rounded mb-2" required>
+            <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+          </form>
+        </div>
+        <div class="items-center px-4 py-3">
+          <button id="cancel-add-user" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+            Cancel
+          </button>
+          <button id="submit-add-user" class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     function showToast(msg, error=false) {
@@ -155,6 +187,48 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
           row.style.display = 'none';
         }
       });
+    });
+
+    // Modal handling
+    const addUserModal = document.getElementById('add-user-modal');
+    const addUserBtn = document.getElementById('add-user-btn');
+    const cancelAddUserBtn = document.getElementById('cancel-add-user');
+    const submitAddUserBtn = document.getElementById('submit-add-user');
+    const addUserForm = document.getElementById('add-user-form');
+
+    addUserBtn.addEventListener('click', () => {
+      addUserModal.style.display = 'block';
+    });
+
+    cancelAddUserBtn.addEventListener('click', () => {
+      addUserModal.style.display = 'none';
+      addUserForm.reset();
+    });
+
+    submitAddUserBtn.addEventListener('click', async () => {
+      const formData = new FormData(addUserForm);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/GreenBin/backend/superAdmin/addUser.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          showToast('Admin added successfully');
+          addUserModal.style.display = 'none';
+          addUserForm.reset();
+          // Optionally, refresh the user list or add the new user to the table
+          location.reload();
+        } else {
+          showToast(result.message || 'Failed to add admin', true);
+        }
+      } catch (error) {
+        showToast('Network error', true);
+      }
     });
   </script>
 </body>

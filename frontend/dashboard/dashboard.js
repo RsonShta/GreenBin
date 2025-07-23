@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Geolocation unavailable");
         showToast("Unable to get location. Please enter it manually.");
       },
-      { timeout: 10000 }
+      { timeout: 3000 }
     );
   }
 

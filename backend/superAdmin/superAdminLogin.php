@@ -32,7 +32,7 @@ try {
 
         // Redirect to superAdmin dashboard or return JSON success
         // Here JSON for AJAX login (if you want)
-        echo json_encode(['message' => 'Login successful', 'redirect' => '/GreenBin/frontend/superAdmin/manageUsers.php', 'role' => $user['role']]);
+echo json_encode(['message' => 'Login successful', 'redirect' => '/GreenBin/pages/manageUsers.php', 'role' => $user['role']]);
     } else {
         http_response_code(401);
         echo json_encode(['message' => 'Invalid credentials or not authorized']);

@@ -95,6 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return; // Don't submit if validation fails
     }
 
+    // Capitalize first and last name before sending
+    document.getElementById("first_name").value = capitalizeFirstLetter(
+      document.getElementById("first_name").value.trim()
+    );
+    document.getElementById("last_name").value = capitalizeFirstLetter(
+      document.getElementById("last_name").value.trim()
+    );
+
     try {
       const formData = new FormData(form);
       const response = await fetch(form.action, {
@@ -113,45 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Network error: " + err.message);
     }
   });
-});
-function capitalizeFirstLetter(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const isEmailValid = validateEmail();
-  const isPhoneValid = validatePhone();
-  const isPassValid = validatePassword();
-  const isConfirmValid = validateConfirm();
-
-  if (!(isEmailValid && isPhoneValid && isPassValid && isConfirmValid)) {
-    return; // Don't submit if validation fails
-  }
-
-  // ✅ Capitalize first and last name before sending
-  document.getElementById("first_name").value = capitalizeFirstLetter(
-    document.getElementById("first_name").value.trim()
-  );
-  document.getElementById("last_name").value = capitalizeFirstLetter(
-    document.getElementById("last_name").value.trim()
-  );
-
-  try {
-    const formData = new FormData(form);
-    const response = await fetch(form.action, {
-      method: "POST",
-      body: formData,
-    });
-    const result = await response.json();
-
-    if (response.ok) {
-      window.location.href = `/GreenBin/dashboard`;
-    } else {
-      alert("Error: " + result.message);
-    }
-  } catch (err) {
-    alert("Network error: " + err.message);
+  function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
 });

@@ -122,6 +122,11 @@ if (isset($_SESSION['user_id'])) {
         <a href="/GreenBin/register" class="text-green-600 font-semibold hover:underline">Register</a>
       </p>
 
+      <!-- ✅ Forgot Password Link -->
+      <p class="text-center text-sm mb-2">
+        <a href="/GreenBin/forgot-password" class="text-green-600 font-semibold hover:underline">Forgot Password?</a>
+      </p>
+
       <!-- ✅ Home Link -->
       <p class="text-center text-sm mb-4">
         <a href="/GreenBin/home" class="text-green-600 font-semibold hover:underline">&#8592; Back to Home</a>
