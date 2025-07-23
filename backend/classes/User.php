@@ -125,4 +125,80 @@ class User
             return ['success' => false, 'message' => 'Internal Server Error.', 'code' => 500];
         }
     }
+
+    public function requestPasswordReset(string $email): array
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['success' => false, 'message' => 'Invalid email address.', 'code' => 400];
+        }
+
+        try {
+            $stmt = $this->pdo->prepare("SELECT id FROM users WHERE email_id = :email");
+            $stmt->execute([':email' => $email]);
+            if (!$stmt->fetch()) {
+                return ['success' => false, 'message' => 'No user found with that email address.', 'code' => 404];
+            }
+
+            $token = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $token);
+            $expires = time() + 3600;
+
+            $stmt = $this->pdo->prepare("INSERT INTO password_resets (email, token, expires) VALUES (:email, :token, :expires)");
+            $stmt->execute([':email' => $email, ':token' => $tokenHash, ':expires' => $expires]);
+
+            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/GreenBin/pages/reset-password.php?token=" . $token;
+
+            return [
+                'success' => true,
+                'message' => 'Password reset link has been generated.',
+                'reset_link' => $resetLink,
+                'code' => 200
+            ];
+        } catch (PDOException $e) {
+            error_log("Password reset request error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Server error.', 'code' => 500];
+        }
+    }
+
+    public function resetPassword(string $token, string $password): array
+    {
+        if (empty($token) || empty($password)) {
+            return ['success' => false, 'message' => 'Token and password are required.', 'code' => 400];
+        }
+
+        if (strlen($password) < 8) {
+            return ['success' => false, 'message' => 'Password must be at least 8 characters long.', 'code' => 400];
+        }
+
+        try {
+            $tokenHash = hash('sha256', $token);
+
+            $stmt = $this->pdo->prepare("SELECT * FROM password_resets WHERE token = :token AND expires >= :now");
+            $stmt->execute([':token' => $tokenHash, ':now' => time()]);
+            $resetRequest = $stmt->fetch();
+
+            if (!$resetRequest) {
+                return ['success' => false, 'message' => 'Invalid or expired token.', 'code' => 400];
+            }
+
+            $email = $resetRequest['email'];
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+            $this->pdo->beginTransaction();
+
+            $updateStmt = $this->pdo->prepare("UPDATE users SET password_hash = :password_hash WHERE email_id = :email");
+            $updateStmt->execute([':password_hash' => $passwordHash, ':email' => $email]);
+
+            $deleteStmt = $this->pdo->prepare("DELETE FROM password_resets WHERE email = :email");
+            $deleteStmt->execute([':email' => $email]);
+
+            $this->pdo->commit();
+
+            return ['success' => true, 'message' => 'Password has been reset successfully.', 'code' => 200];
+        } catch (PDOException $e) {
+            $this->pdo->rollBack();
+            error_log("Password update error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Server error.', 'code' => 500];
+        }
+    }
 }
