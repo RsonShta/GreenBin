@@ -208,4 +208,17 @@ class Report
             return ['success' => false, 'message' => 'Database error occurred.', 'code' => 500];
         }
     }
+
+    public function getReportsByUserId(int $userId): array
+    {
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM reports WHERE user_id = ? ORDER BY created_at DESC");
+            $stmt->execute([$userId]);
+            $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return ['success' => true, 'reports' => $reports, 'code' => 200];
+        } catch (PDOException $e) {
+            error_log("DB Error in Report.php: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Database error occurred.', 'code' => 500];
+        }
+    }
 }
