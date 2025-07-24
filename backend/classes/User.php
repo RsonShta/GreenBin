@@ -160,10 +160,14 @@ class User
         }
     }
 
-    public function resetPassword(string $token, string $password): array
+    public function resetPassword(string $email, string $password): array
     {
-        if (empty($token) || empty($password)) {
-            return ['success' => false, 'message' => 'Token and password are required.', 'code' => 400];
+        if (empty($email) || empty($password)) {
+            return ['success' => false, 'message' => 'Email and password are required.', 'code' => 400];
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['success' => false, 'message' => 'Invalid email address.', 'code' => 400];
         }
 
         if (strlen($password) < 8) {
@@ -171,32 +175,19 @@ class User
         }
 
         try {
-            $tokenHash = hash('sha256', $token);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM password_resets WHERE token = :token AND expires >= :now");
-            $stmt->execute([':token' => $tokenHash, ':now' => time()]);
-            $resetRequest = $stmt->fetch();
-
-            if (!$resetRequest) {
-                return ['success' => false, 'message' => 'Invalid or expired token.', 'code' => 400];
+            $stmt = $this->pdo->prepare("SELECT id FROM users WHERE email_id = :email");
+            $stmt->execute([':email' => $email]);
+            if (!$stmt->fetch()) {
+                return ['success' => false, 'message' => 'No user found with that email address.', 'code' => 404];
             }
 
-            $email = $resetRequest['email'];
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-
-            $this->pdo->beginTransaction();
 
             $updateStmt = $this->pdo->prepare("UPDATE users SET password_hash = :password_hash WHERE email_id = :email");
             $updateStmt->execute([':password_hash' => $passwordHash, ':email' => $email]);
 
-            $deleteStmt = $this->pdo->prepare("DELETE FROM password_resets WHERE email = :email");
-            $deleteStmt->execute([':email' => $email]);
-
-            $this->pdo->commit();
-
             return ['success' => true, 'message' => 'Password has been reset successfully.', 'code' => 200];
         } catch (PDOException $e) {
-            $this->pdo->rollBack();
             error_log("Password update error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Server error.', 'code' => 500];
         }
