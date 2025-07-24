@@ -153,12 +153,6 @@ $lang = $_SESSION['lang'] ?? 'en';
                 🌿
             </p>
 
-            <p class="text-center text-xs mt-4">
-                <a href="/GreenBin/pages/forgot-password.php" class="text-green-600 font-semibold hover:underline">
-                    <?= $lang === 'np' ? 'पासवर्ड बिर्सनुभयो?' : 'Forgot your password?' ?>
-                </a>
-            </p>
-
             <p class="text-center text-xs mt-2">
                 <?= $lang === 'np' ? 'सहायता चाहिन्छ?' : 'Need help?' ?>
                 <a href="mailto:support@greennepal.com" class="text-green-600 font-semibold hover:underline">

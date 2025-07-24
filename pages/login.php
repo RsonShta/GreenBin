@@ -124,7 +124,7 @@ if (isset($_SESSION['user_id'])) {
 
       <!-- ✅ Forgot Password Link -->
       <p class="text-center text-sm mb-2">
-        <a href="/GreenBin/forgot-password" class="text-green-600 font-semibold hover:underline">Forgot Password?</a>
+        <a href="/GreenBin/reset-password" class="text-green-600 font-semibold hover:underline">Forgot Password?</a>
       </p>
 
       <!-- ✅ Home Link -->
