@@ -12,7 +12,7 @@ if (!$reportId) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT report_id, user_id, title, description, image_path, location, status, co2_reduction_kg 
+    $stmt = $pdo->prepare("SELECT report_id, user_id, title, description, image_path, location, status
                            FROM reports WHERE report_id = ?");
     $stmt->execute([$reportId]);
 $report = $stmt->fetch(PDO::FETCH_ASSOC);

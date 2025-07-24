@@ -83,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 modalTitle.textContent = r.title;
                 modalDescription.textContent = r.description;
                 modalUser.textContent = r.user_id;
-                modalCo2.textContent = r.co2_reduction_kg;
                 statusSelect.value = r.status;
 
                 modalLocation.textContent = r.location;

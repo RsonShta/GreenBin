@@ -6,7 +6,7 @@
   <!-- Edit Report Modal -->
   <div id="editModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
     <div class="bg-white p-6 rounded-md w-full max-w-lg shadow-lg relative">
-      <button onclick="closeEditModal()" class="absolute top-2 right-2 text-gray-600 text-xl">&times;</button>
+      <button id="closeEditModalBtn" class="absolute top-2 right-2 text-gray-600 text-xl">&times;</button>
       <h3 class="text-xl font-bold mb-4"><?= $lang === 'np' ? 'रिपोर्ट सम्पादन गर्नुहोस्' : 'Edit Report' ?></h3>
       <form id="editReportForm" class="space-y-4" enctype="multipart/form-data">
         <input type="hidden" name="reportId" id="editReportId" />

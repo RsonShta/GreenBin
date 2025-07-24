@@ -28,9 +28,7 @@ try {
     $resolvedCount = $statusCounts['resolved'] ?? 0;
 
     // CO2 Reduction
-    $stmt = $pdo->prepare("SELECT SUM(co2_reduction_kg) FROM reports WHERE user_id = ?");
-    $stmt->execute([$userId]);
-    $co2Reduction = $stmt->fetchColumn() ?: 0;
+    $co2Reduction = $resolvedCount * 1.5; // Example calculation
 
     // Community Points (resolved * 10)
     $communityPoints = $resolvedCount * 10;
@@ -45,9 +43,9 @@ try {
             "pendingCount" => $pendingCount,
             "inProgressCount" => $inProgressCount,
             "resolvedCount" => $resolvedCount,
-            "co2Reduction" => $co2Reduction,
             "communityPoints" => $communityPoints,
-            "resolutionRate" => $resolutionRate
+            "resolutionRate" => $resolutionRate,
+            "co2Reduction" => $co2Reduction
         ]
     ]);
 } catch (Exception $e) {

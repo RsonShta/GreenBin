@@ -124,9 +124,6 @@ $lang = $_SESSION['lang'] ?? 'en';
             <p class="text-sm text-gray-700 mb-2"><strong><?= $lang === 'np' ? 'प्रयोगकर्ता ID' : 'User ID' ?>:</strong>
                 <span id="modalUser"></span>
             </p>
-            <p class="text-sm text-gray-700 mb-2"><strong>CO₂:</strong>
-                <span id="modalCo2"></span> kg
-            </p>
             <p class="text-sm text-gray-700 mb-4"><strong><?= $lang === 'np' ? 'स्थान' : 'Location' ?>:</strong>
                 <span id="modalLocation"></span>
             </p>

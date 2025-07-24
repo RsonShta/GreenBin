@@ -11,13 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-if (!isset($_GET['id'])) {
+if (!isset($_POST['editReportId'])) {
     http_response_code(400);
     echo json_encode(['message' => 'Report ID is required.']);
     exit;
 }
 
-$reportId = (int)$_GET['id'];
+$reportId = (int)$_POST['editReportId'];
 $report = new Report();
 $result = $report->update($reportId, $_POST);
 
