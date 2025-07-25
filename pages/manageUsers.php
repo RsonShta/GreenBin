@@ -123,11 +123,13 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
           return;
         }
 
+        const csrfToken = document.querySelector('input[name="_csrf_token"]').value;
+
         try {
           const res = await fetch('/GreenBin/backend/superAdmin/updateRole.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: userId, new_role: newRole, _csrf_token: '<?= htmlspecialchars($csrf_token) ?>' })
+            body: JSON.stringify({ user_id: userId, new_role: newRole, _csrf_token: csrfToken })
           });
 
           const data = await res.json();
@@ -152,11 +154,13 @@ $users = $pdo->query("SELECT id, first_name, email_id, phone_number, role FROM u
         const userId = tr.dataset.userId;
         if (!confirm('Delete this user? This action cannot be undone.')) return;
 
+        const csrfToken = document.querySelector('input[name="_csrf_token"]').value;
+
         try {
           const res = await fetch('/GreenBin/backend/superAdmin/deleteUser.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId, _csrf_token: '<?= htmlspecialchars($csrf_token) ?>' })
+            body: JSON.stringify({ user_id: userId, _csrf_token: csrfToken })
           });
 
           const data = await res.json();

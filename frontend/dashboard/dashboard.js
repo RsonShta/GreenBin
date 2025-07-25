@@ -351,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
           console.error("Geolocation error:", error);
           this.showToast("Unable to get location. Please enter it manually.", 'error');
         },
-        { timeout: 10000, enableHighAccuracy: true }
+        { timeout: 1000, enableHighAccuracy: true }
       );
     }
 
@@ -541,7 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setInterval(() => {
         this.loadUserReports();
         this.loadDashboardStats();
-      }, 5000);
+      }, 2000);
     }
 
     initializeDefaultTab() {

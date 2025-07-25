@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalTitle = document.getElementById("modalTitle");
     const modalDescription = document.getElementById("modalDescription");
     const modalUser = document.getElementById("modalUser");
-    const modalCo2 = document.getElementById("modalCo2");
     const modalLocation = document.getElementById("modalLocation");
     const statusSelect = document.getElementById("statusSelect");
 

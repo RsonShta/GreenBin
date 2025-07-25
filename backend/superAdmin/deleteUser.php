@@ -6,17 +6,14 @@ require_once __DIR__ . '/../includes/db.php';
 
 header('Content-Type: application/json');
 
+$data = json_decode(file_get_contents('php://input'), true);
+
 // CSRF Protection
-if (!isset($_SESSION['csrf_token']) || !isset($data['_csrf_token']) || $_SESSION['csrf_token'] !== $data['_csrf_token']) {
+if (!isset($_SESSION['csrf_token']) || !isset($data['_csrf_token']) || !hash_equals($_SESSION['csrf_token'], $data['_csrf_token'])) {
     http_response_code(403);
     echo json_encode(['message' => 'Invalid CSRF token.']);
     exit();
 }
-
-// Remove CSRF token from data
-unset($data['_csrf_token']);
-
-$data = json_decode(file_get_contents('php://input'), true);
 $userId = $data['user_id'] ?? null;
 
 if (!$userId) {
@@ -51,22 +48,40 @@ try {
 
     $oldRole = $user['role'];
 
-    // Delete user
-    $deleteStmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
-    $deleteStmt->execute([':id' => $userId]);
+    // Start a transaction to ensure atomicity
+    $pdo->beginTransaction();
 
-    // Log deletion with old role as old_value, new_value null
-    $logStmt = $pdo->prepare("
-        INSERT INTO admin_logs (admin_id, action, target_user_id, old_value, new_value, created_at)
-        VALUES (:admin_id, 'user_deleted', :target_user_id, :old_val, NULL, NOW())
-    ");
-    $logStmt->execute([
-        ':admin_id' => $_SESSION['user_id'],
-        ':target_user_id' => $userId,
-        ':old_val' => $oldRole
-    ]);
+    try {
+        // First, delete associated reports to satisfy foreign key constraints.
+        $deleteReportsStmt = $pdo->prepare("DELETE FROM reports WHERE user_id = :user_id");
+        $deleteReportsStmt->execute([':user_id' => $userId]);
 
-    echo json_encode(['message' => 'User deleted successfully.']);
+        // Then, delete the user
+        $deleteUserStmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
+        $deleteUserStmt->execute([':id' => $userId]);
+        
+        // Finally, log the deletion now that the admin_logs table exists.
+        $logStmt = $pdo->prepare("
+            INSERT INTO admin_logs (admin_id, action, target_user_id, old_value, new_value, created_at)
+            VALUES (:admin_id, 'user_deleted', :target_user_id, :old_val, NULL, NOW())
+        ");
+        $logStmt->execute([
+            ':admin_id' => $_SESSION['user_id'],
+            ':target_user_id' => $userId,
+            ':old_val' => $oldRole
+        ]);
+
+        // If all good, commit the transaction
+        $pdo->commit();
+
+        echo json_encode(['message' => 'User deleted successfully.']);
+
+    } catch (PDOException $e) {
+        // If something goes wrong, roll back the transaction
+        $pdo->rollBack();
+        throw $e; // Re-throw the exception to be caught by the outer catch block
+    }
+
 } catch (PDOException $e) {
     error_log("deleteUser error: " . $e->getMessage());
     http_response_code(500);

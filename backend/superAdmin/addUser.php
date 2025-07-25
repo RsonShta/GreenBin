@@ -75,6 +75,16 @@ try {
         ':address' => $address
     ]);
 
+    // Log the user creation
+    $logStmt = $pdo->prepare("
+        INSERT INTO admin_logs (admin_id, action, target_user_id, new_value)
+        VALUES (:admin_id, 'user_created', :target_user_id, 'admin')
+    ");
+    $logStmt->execute([
+        ':admin_id' => $_SESSION['user_id'],
+        ':target_user_id' => $userId
+    ]);
+
     $pdo->commit();
 
     echo json_encode(['message' => 'Admin added successfully']);
