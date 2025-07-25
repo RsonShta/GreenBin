@@ -47,25 +47,59 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
   </div>
 
   <!-- Stats Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center text-gray-800">
-    <div class="bg-green-100 rounded p-4 shadow">
+<div class="w-full flex justify-center mt-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center text-gray-800 max-w-8xl w-full px-4">
+    <div class="bg-green-100 rounded-lg p-6 shadow-lg">
       <h2 class="text-xl font-semibold">Total Reports</h2>
-      <p id="totalReports" class="text-3xl font-bold mt-2"><?= $totalReports ?></p>
-      <p id="statusCounts" class="text-sm text-gray-600 mt-1">
+      <p id="totalReports" class="text-4xl font-bold mt-3"><?= $totalReports ?></p>
+      <p id="statusCounts" class="text-sm text-gray-600 mt-2">
         <?= "{$pendingCount} pending, {$inProgressCount} in progress" ?>
       </p>
     </div>
-    <div class="bg-green-100 rounded p-4 shadow">
+
+    <div class="bg-green-100 rounded-lg p-6 shadow-lg">
       <h2 class="text-xl font-semibold">Resolution Rate</h2>
-      <p id="resolutionRate" class="text-3xl font-bold mt-2"><?= $resolutionRate ?>%</p>
-      <p id="resolvedCount" class="text-sm text-gray-600 mt-1"><?= $resolvedCount ?> resolved</p>
+      <p id="resolutionRate" class="text-4xl font-bold mt-3"><?= $resolutionRate ?>%</p>
+      <p id="resolvedCount" class="text-sm text-gray-600 mt-2"><?= $resolvedCount ?> resolved</p>
     </div>
-    <div class="bg-green-100 rounded p-4 shadow">
+
+    <div class="bg-green-100 rounded-lg p-6 shadow-lg">
       <h2 class="text-xl font-semibold">Community Points</h2>
-      <p id="communityPoints" class="text-3xl font-bold mt-2"><?= $communityPoints ?></p>
-      <p class="text-sm text-gray-600 mt-1">Eco-warrior level</p>
+      <p id="communityPoints" class="text-4xl font-bold mt-3"><?= $communityPoints ?></p>
+      <p class="text-sm text-gray-600 mt-2">Eco-warrior level</p>
+    </div>
+
+    <div class="bg-green-100 rounded-lg p-6 shadow-lg">
+      <h2 class="text-xl font-semibold">Saving Tip</h2>
+      <p id="savingTip" class="text-lg mt-2">Loading...</p>
     </div>
   </div>
+</div>
+
+<script>
+  const tips = [
+    "Turn off lights when leaving a room.",
+    "Unplug chargers when not in use to save energy.",
+    "Use reusable water bottles instead of plastic.",
+    "Take shorter showers to save water.",
+    "Walk or cycle for short distances instead of driving.",
+    "Use natural sunlight during the day instead of lights.",
+    "Recycle paper, plastic, and glass properly.",
+    "Use cloth bags instead of plastic bags.",
+    "Switch to energy-efficient LED bulbs.",
+    "Plant a tree or grow indoor plants for cleaner air."
+  ];
+
+  const tipElement = document.getElementById("savingTip");
+
+  function changeTip() {
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    tipElement.textContent = randomTip;
+  }
+
+  changeTip(); // Show one immediately
+  setInterval(changeTip, 5000); // Change every 5 seconds
+</script>
 
 
   <!-- Navigation Tabs -->
