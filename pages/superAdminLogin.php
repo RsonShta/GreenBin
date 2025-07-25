@@ -1,8 +1,8 @@
 <?php
 session_start();
 // Redirect if already logged in as superadmin
-if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'superadmin') {
-    header("Location: /GreenBin/superadmin"); // Assuming 'superadmin' is the route for superadmin dashboard
+if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'superAdmin') {
+    header("Location: /GreenBin/superadmin");
     exit;
 }
 ?>

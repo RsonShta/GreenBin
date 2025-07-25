@@ -7,16 +7,25 @@ require_once __DIR__ . '/../includes/db.php';
 header('Content-Type: application/json');
 
 // CSRF Protection
-if (!isset($_SESSION['csrf_token']) || !isset($data['_csrf_token']) || $_SESSION['csrf_token'] !== $data['_csrf_token']) {
+$input_data = json_decode(file_get_contents('php://input'), true);
+
+if (!$input_data) {
+    http_response_code(400);
+    echo json_encode(['message' => 'Invalid JSON input.']);
+    exit();
+}
+
+if (!isset($_SESSION['csrf_token']) || !isset($input_data['_csrf_token']) || $_SESSION['csrf_token'] !== $input_data['_csrf_token']) {
     http_response_code(403);
     echo json_encode(['message' => 'Invalid CSRF token.']);
     exit();
 }
 
 // Remove CSRF token from data
-unset($data['_csrf_token']);
+unset($input_data['_csrf_token']);
 
-$data = json_decode(file_get_contents('php://input'), true);
+// Use $input_data for subsequent operations
+$data = $input_data;
 
 $userId = $data['user_id'] ?? null;
 $newRole = $data['new_role'] ?? null;

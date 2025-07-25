@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let data = {};
       try {
-        if (response.headers.get("content-type")?.includes("application/json")) {
+        if (
+          response.headers.get("content-type")?.includes("application/json")
+        ) {
           data = await response.json();
         }
       } catch {
@@ -57,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = data.message || "Login successful!";
         setTimeout(() => {
           if (data.role === "superAdmin") {
-            window.location.href = "/GreenBin/manageUsers";
+            window.location.href = "/GreenBin/superadmin";
           } else if (data.role === "admin") {
             window.location.href = "/GreenBin/adminDashboard";
           } else if (data.role === "user") {

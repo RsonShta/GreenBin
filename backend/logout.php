@@ -2,5 +2,5 @@
 session_start();
 session_unset();
 session_destroy();
-header("Location: /GreenBin/login");
+header("Location: /GreenBin/home");
 exit();
