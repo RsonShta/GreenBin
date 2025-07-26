@@ -17,14 +17,14 @@ $token = htmlspecialchars($_GET['token'] ?? '');
             <input type="hidden" name="token" value="<?= $token ?>">
             <div>
                 <label for="password" class="text-sm font-medium text-gray-700"><?= $lang === 'np' ? 'नयाँ पासवर्ड' : 'New Password' ?></label>
-                <input type="password" name="password" id="password" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="password" name="password" id="password" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
             </div>
             <div class="mt-4">
                 <label for="confirm_password" class="text-sm font-medium text-gray-700"><?= $lang === 'np' ? 'पासवर्ड पुष्टि गर्नुहोस्' : 'Confirm Password' ?></label>
-                <input type="password" name="confirm_password" id="confirm_password" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="password" name="confirm_password" id="confirm_password" required class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
             </div>
             <div class="mt-6">
-                <button type="submit" class="w-full px-4 py-2 font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button type="submit" class="w-full px-4 py-2 font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                     <?= $lang === 'np' ? 'पासवर्ड रिसेट गर्नुहोस्' : 'Reset Password' ?>
                 </button>
             </div>

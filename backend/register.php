@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $user->register($_POST);
 
     http_response_code($result['code']);
-    echo json_encode(['message' => $result['message']]);
+    echo json_encode($result);
 } else {
     http_response_code(405);
     echo json_encode(['message' => 'Method not allowed.']);

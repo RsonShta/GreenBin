@@ -76,6 +76,8 @@ $lang = $_SESSION['lang'] ?? 'en';
                 <?= $lang === 'np' ? 'तपाईंको समुदायमा फरक ल्याउनको लागि आफ्नो खाता बनाउनुहोस् 🌱' : 'Create your account to start making a difference in your community 🌱' ?>
             </p>
 
+            <div id="message" class="text-center mb-4"></div>
+
             <!-- Grid Layout -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>

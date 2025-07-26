@@ -16,7 +16,9 @@ RewriteRule ^adminProfile/?$ pages/adminProfile.php [L,QSA]
 RewriteRule ^adminEditProfile/?$ pages/adminEditProfile.php [L,QSA]
 RewriteRule ^superAdminLogin/?$ pages/superAdminLogin.php [L,QSA]
 RewriteRule ^superAdminProfile/?$ pages/superAdminProfile.php [L,QSA]
+RewriteRule ^forgot-password/?$ pages/forgot-password.php [L,QSA]
 RewriteRule ^reset-password/?$ pages/reset-password.php [L,QSA]
+RewriteRule ^verify/?$ pages/verify.php [L,QSA]
 
 # Handle requests for existing files or directories (e.g., CSS, JS, images)
 RewriteCond %{REQUEST_FILENAME} -f [OR]

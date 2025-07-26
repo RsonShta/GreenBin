@@ -107,15 +107,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData(form);
       const response = await fetch(form.action, {
         method: "POST",
-        body: formData,
+        body: new URLSearchParams(new FormData(form))
       });
       const result = await response.json();
+      const messageDiv = document.getElementById('message');
 
       if (response.ok) {
-        const userId = result.user_id;
-        window.location.href = `/GreenBin/dashboard`;
+        messageDiv.style.color = 'green';
+        if (result.verify_link) {
+          messageDiv.innerHTML = `${result.message} <br><a href="${result.verify_link}" class="text-indigo-600 hover:underline">Click here to verify</a>`;
+        } else {
+          messageDiv.textContent = 'Registration successful! Redirecting to login...';
+          setTimeout(() => {
+            window.location.href = '/GreenBin/login';
+          }, 2000);
+        }
       } else {
-        alert("Error: " + result.message);
+        messageDiv.style.color = 'red';
+        messageDiv.textContent = result.message;
       }
     } catch (err) {
       alert("Network error: " + err.message);

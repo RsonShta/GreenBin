@@ -60,10 +60,11 @@ class User
             }
 
             $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+            $verificationToken = bin2hex(random_bytes(32));
 
             $stmt = $this->pdo->prepare("
-                INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country, role, profile_photo)
-                VALUES (:first_name, :last_name, :email, :password_hash, :phone, :country, :role, :profile_photo)
+                INSERT INTO users (first_name, last_name, email_id, password_hash, phone_number, country, role, profile_photo, verification_token, is_verified)
+                VALUES (:first_name, :last_name, :email, :password_hash, :phone, :country, :role, :profile_photo, :token, 0)
             ");
 
             $stmt->execute([
@@ -74,12 +75,13 @@ class User
                 ':phone' => $phone,
                 ':country' => 'NP',
                 ':role' => 'user',
-                ':profile_photo' => 'default.jpg'
+                ':profile_photo' => 'default.jpg',
+                ':token' => $verificationToken
             ]);
 
-            $userId = $this->pdo->lastInsertId();
+            $verifyLink = "http://" . $_SERVER['HTTP_HOST'] . "/GreenBin/verify?token=" . $verificationToken;
 
-            return ['success' => true, 'message' => 'Registration successful.', 'user_id' => $userId, 'role' => 'user', 'code' => 201];
+            return ['success' => true, 'message' => 'Registration successful. Please verify your email.', 'verify_link' => $verifyLink, 'code' => 201];
         } catch (PDOException $e) {
             error_log("Registration Error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Internal Server Error.', 'code' => 500];
@@ -96,11 +98,14 @@ class User
         }
 
         try {
-            $stmt = $this->pdo->prepare("SELECT id, first_name, password_hash, role FROM users WHERE email_id = :email");
+            $stmt = $this->pdo->prepare("SELECT id, first_name, password_hash, role, is_verified FROM users WHERE email_id = :email");
             $stmt->execute([':email' => $email]);
-            $user = $stmt->fetch();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($user && password_verify($password, $user['password_hash'])) {
+                if ($user['is_verified'] == 0) {
+                    return ['success' => false, 'message' => 'Please verify your email before logging in.', 'code' => 403];
+                }
                 if ($user['role'] === 'user') {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_name'] = $user['first_name'];
@@ -146,11 +151,12 @@ class User
             $stmt = $this->pdo->prepare("INSERT INTO password_resets (email, token, expires) VALUES (:email, :token, :expires)");
             $stmt->execute([':email' => $email, ':token' => $tokenHash, ':expires' => $expires]);
 
-            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/GreenBin/pages/reset-password.php?token=" . $token;
+            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/GreenBin/reset-password?token=" . $token;
 
+            // For non-production, we can return the link directly.
             return [
                 'success' => true,
-                'message' => 'Password reset link has been generated.',
+                'message' => 'Password reset link generated successfully.',
                 'reset_link' => $resetLink,
                 'code' => 200
             ];
@@ -198,6 +204,31 @@ class User
         } catch (PDOException $e) {
             $this->pdo->rollBack();
             error_log("Password update error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Server error.', 'code' => 500];
+        }
+    }
+
+    public function verifyEmail(string $token): array
+    {
+        if (empty($token)) {
+            return ['success' => false, 'message' => 'Verification token is required.', 'code' => 400];
+        }
+
+        try {
+            $stmt = $this->pdo->prepare("SELECT id FROM users WHERE verification_token = :token AND is_verified = 0");
+            $stmt->execute([':token' => $token]);
+            $user = $stmt->fetch();
+
+            if (!$user) {
+                return ['success' => false, 'message' => 'Invalid or expired verification token.', 'code' => 400];
+            }
+
+            $updateStmt = $this->pdo->prepare("UPDATE users SET is_verified = 1, verification_token = NULL WHERE id = :id");
+            $updateStmt->execute([':id' => $user['id']]);
+
+            return ['success' => true, 'message' => 'Email verified successfully. You can now log in.', 'code' => 200];
+        } catch (PDOException $e) {
+            error_log("Email verification error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Server error.', 'code' => 500];
         }
     }
