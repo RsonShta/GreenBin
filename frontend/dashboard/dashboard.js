@@ -483,16 +483,32 @@ document.addEventListener("DOMContentLoaded", () => {
     async handleEditFormSubmit(e) {
       e.preventDefault();
 
-      const formData = new FormData(this.editForm);
+      const formData = new FormData(); // Create an empty FormData object
       const errorBox = document.getElementById("editError");
 
-      // Get location value from the edit form
+      // Manually append fields to ensure correct names
+      const reportIdInput = document.getElementById("editReportId");
+      if (reportIdInput) {
+        formData.append("editReportId", reportIdInput.value);
+      }
+
+      const titleInput = document.getElementById("editTitle");
+      if (titleInput) {
+        formData.append("reportTitle", titleInput.value.trim()); // Use 'reportTitle' to match backend
+      }
+
+      const descriptionInput = document.getElementById("editDescription");
+      if (descriptionInput) {
+        formData.append("description", descriptionInput.value.trim()); // Use 'description' to match backend
+      }
+
       const locationInput = document.getElementById("editLocation");
       if (locationInput) {
         formData.append("location", locationInput.value.trim());
       }
 
-      if (!formData.get("title")?.trim() || !formData.get("description")?.trim()) {
+      // Re-validate using the new formData structure
+      if (!formData.get("reportTitle")?.trim() || !formData.get("description")?.trim()) {
         if (errorBox) {
           errorBox.textContent = "Title and description are required.";
           errorBox.classList.remove("hidden");
