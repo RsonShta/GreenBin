@@ -327,6 +327,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const locationPermissionMessage = document.getElementById('location-permission-message');
 
       if (!locationInput || !locationPermissionMessage) return;
+
+      // Try to load location from session storage first for immediate display
+      const storedLocation = sessionStorage.getItem('user_location');
+      if (storedLocation) {
+        locationInput.value = storedLocation;
+        locationPermissionMessage.textContent = 'Using cached location.';
+      }
       
       if (!navigator.geolocation) {
         locationPermissionMessage.textContent = 'Your browser does not support geolocation.';
@@ -335,8 +342,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Always attempt to get current position for the most up-to-date location
       locationPermissionMessage.textContent = 'Please allow location access to automatically detect your location. You can change it later.';
-      this.showToast("Getting your location...");
+      if (!storedLocation) { // Only show "Getting location..." toast if no cached location
+        this.showToast("Getting your location...");
+      }
 
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -351,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
           console.error("Geolocation error:", error);
           this.showToast("Unable to get location. Please enter it manually.", 'error');
         },
-        { timeout: 1000, enableHighAccuracy: true }
+        { timeout: 1000, enableHighAccuracy: true } // Reduced timeout for faster response
       );
     }
 
@@ -475,6 +485,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const formData = new FormData(this.editForm);
       const errorBox = document.getElementById("editError");
+
+      // Get location value from the edit form
+      const locationInput = document.getElementById("editLocation");
+      if (locationInput) {
+        formData.append("location", locationInput.value.trim());
+      }
 
       if (!formData.get("title")?.trim() || !formData.get("description")?.trim()) {
         if (errorBox) {

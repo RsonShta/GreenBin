@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/Database.php';
+require_once __DIR__ . '/../includes/reverseGeocode.php'; // Include the standalone geocoding function
 
 class Report
 {
@@ -8,56 +9,43 @@ class Report
 
     public function __construct()
     {
+        // Get the PDO instance from the singleton Database class
         $this->pdo = Database::getInstance();
     }
 
+    // Sanitize input to prevent XSS
     private function sanitize(string $input): string
     {
         return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
     }
 
-    private function getAddressFromCoordinates(float $latitude, float $longitude): string
-    {
-        $apiKey = '920278be1d4d4f0aa2542e3aaf52b5e9';
-        $url = "https://api.opencagedata.com/geocode/v1/json?q={$latitude}+{$longitude}&key={$apiKey}";
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $data = json_decode($response);
-
-        if ($data && $data->status->code === 200 && count($data->results) > 0) {
-            return $data->results[0]->formatted;
-        }
-
-        return 'Unknown location';
-    }
-
+    // Create a new report with optional image upload
     public function create(array $data, array $files): array
     {
+        // Check user authentication
         if (!isset($_SESSION['user_id'])) {
             return ['success' => false, 'message' => 'User not authenticated.', 'code' => 401];
         }
 
+        // Sanitize inputs
         $title = $this->sanitize($data['reportTitle'] ?? '');
         $description = $this->sanitize($data['description'] ?? '');
         $location = $this->sanitize($data['location'] ?? '');
-        $latitude = null;
-        $longitude = null;
 
+        // Parse location if coordinates are given and get readable address
         if (preg_match('/^([-]?\d{1,2}\.\d+),([-]?\d{1,3}\.\d+)$/', $location, $matches)) {
             $latitude = (float) $matches[1];
             $longitude = (float) $matches[2];
-            $location = $this->getAddressFromCoordinates($latitude, $longitude);
+            // Use the global getAddressFromCoordinates function
+            $location = getAddressFromCoordinates($latitude, $longitude);
         }
 
+        // Validate required fields
         if (empty($title) || empty($description)) {
             return ['success' => false, 'message' => 'Title and Description are required.', 'code' => 400];
         }
 
+        // Handle file upload if image is provided
         $uploadedImagePath = null;
 
         if (!empty($files['photo']) && $files['photo']['error'] === UPLOAD_ERR_OK) {
@@ -66,6 +54,7 @@ class Report
             $fileSize = $files['photo']['size'];
             $fileType = mime_content_type($fileTmpPath);
 
+            // Allowed image types
             $allowedTypes = ['image/png', 'image/jpeg', 'image/gif'];
             if (!in_array($fileType, $allowedTypes)) {
                 return ['success' => false, 'message' => 'Invalid file type. Only PNG, JPG, GIF allowed.', 'code' => 400];
@@ -75,11 +64,13 @@ class Report
                 return ['success' => false, 'message' => 'File size exceeds 5MB limit.', 'code' => 400];
             }
 
+            // Ensure upload directory exists
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/uploads/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
 
+            // Create a unique filename and move uploaded file
             $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
             $newFileName = uniqid('report_', true) . '.' . $fileExt;
             $destPath = $uploadDir . $newFileName;
@@ -91,6 +82,7 @@ class Report
             $uploadedImagePath = $newFileName;
         }
 
+        // Insert the new report into the database
         try {
             $this->pdo->beginTransaction();
             $stmt = $this->pdo->prepare("
@@ -101,6 +93,7 @@ class Report
             $newReportId = $this->pdo->lastInsertId();
             $this->pdo->commit();
 
+            // Fetch the inserted report
             $stmtFetch = $this->pdo->prepare("SELECT * FROM reports WHERE report_id = ?");
             $stmtFetch->execute([$newReportId]);
             $newReport = $stmtFetch->fetch(PDO::FETCH_ASSOC);
@@ -126,6 +119,7 @@ class Report
         }
     }
 
+    // Fetch a report by its ID
     public function getReportById(int $reportId): array
     {
         try {
@@ -144,6 +138,7 @@ class Report
         }
     }
 
+    // Get all reports ordered by creation date
     public function getAllReports(): array
     {
         try {
@@ -156,6 +151,7 @@ class Report
         }
     }
 
+    // Update a report's title and description if owned by the logged-in user
     public function update(int $reportId, array $data): array
     {
         if (!isset($_SESSION['user_id'])) {
@@ -164,6 +160,15 @@ class Report
 
         $title = $this->sanitize($data['reportTitle'] ?? '');
         $description = $this->sanitize($data['description'] ?? '');
+        $location = $this->sanitize($data['location'] ?? ''); // Get location from data
+
+        // Parse location if coordinates are given and get readable address
+        if (preg_match('/^([-]?\d{1,2}\.\d+),([-]?\d{1,3}\.\d+)$/', $location, $matches)) {
+            $latitude = (float) $matches[1];
+            $longitude = (float) $matches[2];
+            // Use the global getAddressFromCoordinates function
+            $location = getAddressFromCoordinates($latitude, $longitude);
+        }
 
         if (empty($title) || empty($description)) {
             return ['success' => false, 'message' => 'Title and Description are required.', 'code' => 400];
@@ -172,10 +177,10 @@ class Report
         try {
             $stmt = $this->pdo->prepare("
                 UPDATE reports 
-                SET title = ?, description = ?, updated_at = NOW() 
+                SET title = ?, description = ?, location = ?, updated_at = NOW() 
                 WHERE report_id = ? AND user_id = ?
             ");
-            $stmt->execute([$title, $description, $reportId, $_SESSION['user_id']]);
+            $stmt->execute([$title, $description, $location, $reportId, $_SESSION['user_id']]);
 
             if ($stmt->rowCount() > 0) {
                 return ['success' => true, 'message' => 'Report updated successfully.', 'code' => 200];
@@ -188,6 +193,7 @@ class Report
         }
     }
 
+    // Delete a report if owned by the logged-in user
     public function delete(int $reportId): array
     {
         if (!isset($_SESSION['user_id'])) {
@@ -209,6 +215,7 @@ class Report
         }
     }
 
+    // Get all reports created by a specific user
     public function getReportsByUserId(int $userId): array
     {
         try {
