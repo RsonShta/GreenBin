@@ -2,7 +2,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/backend/includes/auth.php';
 requireRole(['user']);
-// ==================== ✅ DASHBOARD STATS QUERIES ====================
+// ====================    DASHBOARD STATS QUERIES ====================
 $userId = $_SESSION['user_id'] ?? 0;
 
 // Total Reports
@@ -35,7 +35,7 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
 <!-- Main Content -->
 <main class="max-w-[100%] mx-auto p-6">
 
-  <!-- ✅ Dashboard Title + New Report Button -->
+  <!--   Dashboard Title + New Report Button -->
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-green-800">
       <?= $lang === 'np' ? 'ड्यासबोर्ड' : 'Dashboard' ?>
@@ -98,7 +98,7 @@ $resolutionRate = $totalReports > 0 ? round(($resolvedCount / $totalReports) * 1
   }
 
   changeTip(); // Show one immediately
-  setInterval(changeTip, 5000); // Change every 5 seconds
+  setInterval(changeTip, 10000); // Change every 10 seconds
 </script>
 
 

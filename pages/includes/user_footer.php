@@ -10,6 +10,7 @@
       <h3 class="text-xl font-bold mb-4"><?= $lang === 'np' ? 'रिपोर्ट सम्पादन गर्नुहोस्' : 'Edit Report' ?></h3>
       <form id="editReportForm" class="space-y-4" enctype="multipart/form-data">
         <input type="hidden" name="reportId" id="editReportId" />
+        <input type="hidden" name="existingImage" id="existingImage" />
 
         <div>
           <label for="editTitle" class="block text-sm font-medium mb-1">

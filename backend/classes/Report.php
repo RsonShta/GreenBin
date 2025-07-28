@@ -175,16 +175,85 @@ class Report
         }
 
         try {
+            // Handle file upload if a new image is provided
+            $uploadedImagePath = $data['existingImage'] ?? null; // Keep existing image by default
+
+            if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['photo']['tmp_name'];
+                $fileName = basename($_FILES['photo']['name']);
+                $fileSize = $_FILES['photo']['size'];
+                $fileType = mime_content_type($fileTmpPath);
+
+                // Allowed image types
+                $allowedTypes = ['image/png', 'image/jpeg', 'image/gif'];
+                if (!in_array($fileType, $allowedTypes)) {
+                    return ['success' => false, 'message' => 'Invalid file type. Only PNG, JPG, GIF allowed.', 'code' => 400];
+                }
+
+                if ($fileSize > 5 * 1024 * 1024) { // 5MB limit
+                    return ['success' => false, 'message' => 'File size exceeds 5MB limit.', 'code' => 400];
+                }
+
+                // Ensure upload directory exists
+                $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/GreenBin/uploads/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                // Create a unique filename
+                $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+                $newFileName = uniqid('report_', true) . '.' . $fileExt;
+                $destPath = $uploadDir . $newFileName;
+
+                // Move the uploaded file
+                if (move_uploaded_file($fileTmpPath, $destPath)) {
+                    // If a new image is uploaded, delete the old one if it exists
+                    if (!empty($data['existingImage'])) {
+                        $oldImagePath = $uploadDir . basename($data['existingImage']);
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath);
+                        }
+                    }
+                    $uploadedImagePath = $newFileName; // Set the new image path
+                } else {
+                    return ['success' => false, 'message' => 'Error saving uploaded file.', 'code' => 500];
+                }
+            }
+
+            // Update the report in the database
             $stmt = $this->pdo->prepare("
                 UPDATE reports 
-                SET title = ?, description = ?, location = ?, updated_at = NOW() 
+                SET title = ?, description = ?, location = ?, image_path = ?, updated_at = NOW() 
                 WHERE report_id = ? AND user_id = ?
             ");
-            $stmt->execute([$title, $description, $location, $reportId, $_SESSION['user_id']]);
+            $stmt->execute([$title, $description, $location, $uploadedImagePath, $reportId, $_SESSION['user_id']]);
 
             if ($stmt->rowCount() > 0) {
-                return ['success' => true, 'message' => 'Report updated successfully.', 'code' => 200];
+                // Fetch the updated report to return it
+                $stmtFetch = $this->pdo->prepare("SELECT * FROM reports WHERE report_id = ?");
+                $stmtFetch->execute([$reportId]);
+                $updatedReport = $stmtFetch->fetch(PDO::FETCH_ASSOC);
+
+                return [
+                    'success' => true,
+                    'message' => 'Report updated successfully.',
+                    'report' => $updatedReport,
+                    'code' => 200
+                ];
             } else {
+                // If no rows were affected, it might be because the data was the same
+                // or the report doesn't exist. Let's check if the report exists.
+                $stmtCheck = $this->pdo->prepare("SELECT * FROM reports WHERE report_id = ? AND user_id = ?");
+                $stmtCheck->execute([$reportId, $_SESSION['user_id']]);
+                if ($stmtCheck->rowCount() > 0) {
+                    // Report exists, but no changes were made. Return success and the report.
+                    return [
+                        'success' => true,
+                        'message' => 'No changes were made to the report.',
+                        'report' => $stmtCheck->fetch(PDO::FETCH_ASSOC),
+                        'code' => 200
+                    ];
+                }
                 return ['success' => false, 'message' => 'Report not found or user not authorized to update.', 'code' => 404];
             }
         } catch (PDOException $e) {

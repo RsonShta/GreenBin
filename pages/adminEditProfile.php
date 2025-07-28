@@ -71,12 +71,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $department = trim($_POST['department']);
                 $employee_id = trim($_POST['employee_id']);
 
-                $adminUpdate = $pdo->prepare("
-                    INSERT INTO admin_details (user_id, ward, nagarpalika, address, office_phone, department, employee_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE ward = VALUES(ward), nagarpalika = VALUES(nagarpalika), address = VALUES(address), office_phone = VALUES(office_phone), department = VALUES(department), employee_id = VALUES(employee_id)
-                ");
-                $adminUpdate->execute([$userId, $ward, $nagarpalika, $address, $office_phone, $department, $employee_id]);
+                // Check if admin_details record exists
+                $checkAdminDetails = $pdo->prepare("SELECT COUNT(*) FROM admin_details WHERE user_id = ?");
+                $checkAdminDetails->execute([$userId]);
+                $adminDetailsExists = $checkAdminDetails->fetchColumn();
+
+                if ($adminDetailsExists) {
+                    // Update existing admin_details
+                    $adminUpdate = $pdo->prepare("
+                        UPDATE admin_details 
+                        SET ward = ?, nagarpalika = ?, address = ?, office_phone = ?, department = ?, employee_id = ?
+                        WHERE user_id = ?
+                    ");
+                    $adminUpdate->execute([$ward, $nagarpalika, $address, $office_phone, $department, $employee_id, $userId]);
+                } else {
+                    // Insert new admin_details
+                    $adminInsert = $pdo->prepare("
+                        INSERT INTO admin_details (user_id, ward, nagarpalika, address, office_phone, department, employee_id)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ");
+                    $adminInsert->execute([$userId, $ward, $nagarpalika, $address, $office_phone, $department, $employee_id]);
+                }
                 
                 $pdo->commit();
 
@@ -165,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </header>
 
-    <main class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6 mt-2 mb-10">
+    <main class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 mt-2 mb-10">
         <a href="/GreenBin/adminProfile"
             class="inline-block text-green-700 hover:text-white hover:bg-green-700 transition text-xs border border-green-700 rounded px-1.5 py-0.5 mb-4">
             <?= $lang === 'np' ? 'प्रोफाइलमा फर्कनुहोस्' : '<-- Back to Profile' ?>
@@ -180,74 +195,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="text-green-600 text-sm mb-4"><?= htmlspecialchars($success) ?></p>
         <?php endif; ?>
 
-        <form method="POST" enctype="multipart/form-data" class="space-y-5">
-            <!-- First Name -->
-            <div>
-                <label for="first_name" class="block text-sm font-medium mb-1">
-                    <?= $lang === 'np' ? 'नाम' : 'First Name' ?>
-                </label>
-                <input type="text" id="first_name" name="first_name" required
-                    value="<?= htmlspecialchars($user['first_name']) ?>"
-                    class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- First Name -->
+                <div>
+                    <label for="first_name" class="block text-sm font-medium mb-1">
+                        <?= $lang === 'np' ? 'नाम' : 'First Name' ?>
+                    </label>
+                    <input type="text" id="first_name" name="first_name" required
+                        value="<?= htmlspecialchars($user['first_name']) ?>"
+                        class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label for="last_name" class="block text-sm font-medium mb-1">
+                        <?= $lang === 'np' ? 'थर' : 'Last Name' ?>
+                    </label>
+                    <input type="text" id="last_name" name="last_name" required
+                        value="<?= htmlspecialchars($user['last_name']) ?>"
+                        class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="phone_number" class="block text-sm font-medium mb-1">
+                        <?= $lang === 'np' ? 'फोन नम्बर' : 'Phone Number' ?>
+                    </label>
+                    <input type="text" id="phone_number" name="phone_number" required
+                        value="<?= htmlspecialchars($user['phone_number']) ?>"
+                        class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+                </div>
+
+                <!-- Email (disabled) -->
+                <div>
+                    <label for="email" class="block text-sm font-medium mb-1">
+                        Email (<?= $lang === 'np' ? 'परिवर्तन गर्न मिल्दैन' : 'Cannot be changed' ?>)
+                    </label>
+                    <input type="email" id="email" disabled value="<?= htmlspecialchars($user['email_id']) ?>"
+                        class="w-full border border-gray-200 bg-gray-100 p-2 rounded-md cursor-not-allowed" />
+                </div>
             </div>
 
-            <!-- Last Name -->
-            <div>
-                <label for="last_name" class="block text-sm font-medium mb-1">
-                    <?= $lang === 'np' ? 'थर' : 'Last Name' ?>
-                </label>
-                <input type="text" id="last_name" name="last_name" required
-                    value="<?= htmlspecialchars($user['last_name']) ?>"
-                    class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-            </div>
-
-            <!-- Email (disabled) -->
-            <div>
-                <label for="email" class="block text-sm font-medium mb-1">
-                    Email (<?= $lang === 'np' ? 'परिवर्तन गर्न मिल्दैन' : 'Cannot be changed' ?>)
-                </label>
-                <input type="email" id="email" disabled value="<?= htmlspecialchars($user['email_id']) ?>"
-                    class="w-full border border-gray-200 bg-gray-100 p-2 rounded-md cursor-not-allowed" />
-            </div>
-
-            <!-- Phone -->
-            <div>
-                <label for="phone_number" class="block text-sm font-medium mb-1">
-                    <?= $lang === 'np' ? 'फोन नम्बर' : 'Phone Number' ?>
-                </label>
-                <input type="text" id="phone_number" name="phone_number" required
-                    value="<?= htmlspecialchars($user['phone_number']) ?>"
-                    class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-            </div>
-
-            <!-- Admin Fields -->
-            <div>
-                <label for="ward" class="block text-sm font-medium mb-1">Ward</label>
-                <input type="text" id="ward" name="ward" value="<?= htmlspecialchars($user['ward'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
-            </div>
-            <div>
-                <label for="nagarpalika" class="block text-sm font-medium mb-1">Nagarpalika</label>
-                <input type="text" id="nagarpalika" name="nagarpalika" value="<?= htmlspecialchars($user['nagarpalika'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
-            </div>
-            <div>
-                <label for="address" class="block text-sm font-medium mb-1">Address</label>
-                <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
-            </div>
-            <div>
-                <label for="office_phone" class="block text-sm font-medium mb-1">Office Phone</label>
-                <input type="text" id="office_phone" name="office_phone" value="<?= htmlspecialchars($user['office_phone'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
-            </div>
-            <div>
-                <label for="department" class="block text-sm font-medium mb-1">Department</label>
-                <input type="text" id="department" name="department" value="<?= htmlspecialchars($user['department'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
-            </div>
-            <div>
-                <label for="employee_id" class="block text-sm font-medium mb-1">Employee ID</label>
-                <input type="text" id="employee_id" name="employee_id" value="<?= htmlspecialchars($user['employee_id'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+            <h3 class="text-lg font-semibold mt-6 mb-4">
+                <?= $lang === 'np' ? 'प्रशासन विवरण' : 'Admin Details' ?>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Ward -->
+                <div>
+                    <label for="ward" class="block text-sm font-medium mb-1">Ward</label>
+                    <input type="text" id="ward" name="ward" value="<?= htmlspecialchars($user['ward'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+                </div>
+                <!-- Nagarpalika -->
+                <div>
+                    <label for="nagarpalika" class="block text-sm font-medium mb-1">Nagarpalika</label>
+                    <input type="text" id="nagarpalika" name="nagarpalika" value="<?= htmlspecialchars($user['nagarpalika'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+                </div>
+                <!-- Address -->
+                <div>
+                    <label for="address" class="block text-sm font-medium mb-1">Address</label>
+                    <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+                </div>
+                <!-- Office Phone -->
+                <div>
+                    <label for="office_phone" class="block text-sm font-medium mb-1">Office Phone</label>
+                    <input type="text" id="office_phone" name="office_phone" value="<?= htmlspecialchars($user['office_phone'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+                </div>
+                <!-- Department -->
+                <div>
+                    <label for="department" class="block text-sm font-medium mb-1">Department</label>
+                    <input type="text" id="department" name="department" value="<?= htmlspecialchars($user['department'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+                </div>
+                <!-- Employee ID -->
+                <div>
+                    <label for="employee_id" class="block text-sm font-medium mb-1">Employee ID</label>
+                    <input type="text" id="employee_id" name="employee_id" value="<?= htmlspecialchars($user['employee_id'] ?? '') ?>" class="w-full border border-gray-300 p-2 rounded-md" required>
+                </div>
             </div>
 
             <!-- Profile Photo -->
-            <div>
+            <div class="mt-6">
                 <label class="block text-sm font-medium mb-1">
                     <?= $lang === 'np' ? 'प्रोफाइल फोटो' : 'Profile Photo' ?>
                 </label>
